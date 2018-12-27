@@ -1,0 +1,3 @@
+[submodule "chan"]
+	path = themes/chan
+	url = https://github.com/denjones/hexo-theme-chan.git

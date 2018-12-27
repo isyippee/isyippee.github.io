@@ -1,0 +1,33 @@
+sudo: required
+
+language: node_js
+node_js: stable
+cache:
+  directories:
+    - node_modules
+
+branches:
+  only:
+    - source
+
+install:
+  - npm install
+
+before_script:
+  - export TZ=Asia/Shanghai
+  - cp ./theme_chan_config.yml ./themes/chan/_config.yml
+  - sed -i "s/client_id_v/${CLIENT_ID}/g" ./gitment.ejs
+  - sed -i "s/client_secret_v/${CLIENT_SECRET}/g" ./gitment.ejs
+  - cp ./gitment.ejs ./themes/chan/layout/_partials/post
+  - echo "<%- partial('post/gitment') %>" >> ./themes/chan/layout/_partials/article.ejs
+
+script:
+  - hexo clean
+  - hexo g
+
+after_script:
+  - git config user.name "${GITHUB_NAME}"
+  - git config user.email "${GITHUB_EMAIL}"
+  - sed -i "s/travi_token/${TRAVI_TOKEN}/g" ./_config.yml
+  - hexo deploy
+
