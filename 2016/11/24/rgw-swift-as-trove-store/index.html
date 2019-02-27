@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    rgw swift as trove store
+  
+</title>
+
+<meta name="description" content="介绍要使用rgw 的swift接口，只需要创建对应的swift user和key即可。">
+<meta name="keywords" content="openstack trove">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rgw swift as trove store">
+<meta property="og:url" content="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍要使用rgw 的swift接口，只需要创建对应的swift user和key即可。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rgw swift as trove store">
+<meta name="twitter:description" content="介绍要使用rgw 的swift接口，只需要创建对应的swift user和key即可。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-rgw-swift-as-trove-store" class="article article-type-post">
+  
+    <h1 class="article-header">
+      rgw swift as trove store
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-11-24
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-trove/">openstack trove</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>要使用rgw 的swift接口，只需要创建对应的swift user和key即可。<br> <a id="more"></a> </p>
+<h2 id="集成keystone"><a href="#集成keystone" class="headerlink" title="集成keystone"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#u96C6_u6210keystone" title="集成keystone"></a>集成keystone</h2><h3 id="controller节点"><a href="#controller节点" class="headerlink" title="controller节点"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#controller_u8282_u70B9" title="controller节点"></a>controller节点</h3><h4 id="nss"><a href="#nss" class="headerlink" title="nss"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#nss" title="nss"></a>nss</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># mkdir -p /var/ceph/nss &#10;# openssl x509 -in /etc/keystone/ssl/certs/ca.pem -pubkey | \&#10;certutil -d /var/ceph/nss -A -n ca -t &#34;TCu,Cu,Tuw&#34;&#10;# openssl x509 -in /etc/keystone/ssl/certs/signing_cert.pem -pubkey | \&#10;certutil -A -d /var/ceph/nss -n signing_cert -t &#34;P,P,P&#34;</span><br></pre></td></tr></table></figure> 
+
+<p>将<code>/var/ceph/nss</code>拷贝到rgw节点的<code>/var/ceph/nss</code></p>
+<h4 id="添加swift-endpoint"><a href="#添加swift-endpoint" class="headerlink" title="添加swift endpoint"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#u6DFB_u52A0swift_endpoint" title="添加swift endpoint"></a>添加swift endpoint</h4><ol>
+<li>若有使用openstack swift, 需要先删掉原endpoint，原endpoint如下：<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|<span class="string"> 1d7aca58ca47401bbdefb8efe4b5f65d </span>|<span class="string"> RegionOne </span>|<span class="string"> <a href="http://192.168.6.125:8080/v1/AUTH_%(tenant_id)s" target="_blank" rel="noopener">http://192.168.6.125:8080/v1/AUTH_%(tenant_id)s</a> </span>|<span class="string"> <a href="http://192.168.6.125:8080/v1/AUTH_%(tenant_id)s" target="_blank" rel="noopener">http://192.168.6.125:8080/v1/AUTH_%(tenant_id)s</a> </span>|<span class="string"> <a href="http://192.168.6.125:8080/" target="_blank" rel="noopener">http://192.168.6.125:8080/</a> </span>|<span class="string"> 3a408d0525d546c7aca888b3e4d36833 </span>|</span><br></pre></td></tr></table></figure>2.  添加新的endpoint：<br>192.168.6.127为rgw地址<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keystone endpoint-create –region RegionOne \ &#10;–service-id 3a408d0525d546c7aca888b3e4d36833 \ &#10;–publicurl <a href="http://192.168.6.127/swift/v1" target="_blank" rel="noopener">http://192.168.6.127/swift/v1</a> \ &#10;–internalurl <a href="http://192.168.6.127/swift/v1" target="_blank" rel="noopener">http://192.168.6.127/swift/v1</a> \&#10;–adminurl <a href="http://192.168.6.127/swift/v1" target="_blank" rel="noopener">http://192.168.6.127/swift/v1</a></span><br></pre></td></tr></table></figure> 
+
+</li>
+</ol>
+<h3 id="rgw-节点"><a href="#rgw-节点" class="headerlink" title="rgw 节点"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#rgw__u8282_u70B9" title="rgw 节点"></a>rgw 节点</h3><p>在rgw节点修改配置文件<code>/etc/ceph/ceph.conf</code>, 添加如下配置：<br> <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rgw keystone url = <a href="http://192.168.6.125:5000" target="_blank" rel="noopener">http://192.168.6.125:5000</a> </span><br><span class="line">rgw keystone admin token = 85cc6b3914c042fe8be37032ff03fa49</span><br><span class="line">rgw keystone accepted roles = Member, <em>member</em>, admin, SwiftOperator </span><br><span class="line">rgw keystone token <span class="operator"><span class="keyword">cache</span> <span class="keyword">size</span> = <span class="number">500</span></span><br><span class="line">rgw keystone revocation <span class="built_in">interval</span> = <span class="number">500</span> </span><br><span class="line">rgw s3 auth <span class="keyword">use</span> keystone = <span class="literal">true</span></span><br><span class="line">rgw nss db <span class="keyword">path</span> = /<span class="keyword">var</span>/ceph/nss</span></span><br></pre></td></tr></table></figure> </p>
+<p>重启rgdosgw</p>
+<h2 id="trove-调整"><a href="#trove-调整" class="headerlink" title="trove 调整"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#trove__u8C03_u6574" title="trove 调整"></a>trove 调整</h2><p>修改配置文件<code>/etc/trove/trove.conf</code>、<code>/etc/trove/trove-guestmanager.conf</code>, 注释掉<code>swift_url</code>该配置项。</p>
+<p>原该项配置value是<code>http://192.168.6.125:8080/v1/AUTH_</code>, 正确的地址应该是<code>http://192.168.6.127/swift/v1</code>, 即endpoint配置的url。当注释掉该项配置，会从endpoint中查询url</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2016/11/24/rgw-swift-as-trove-store/#u53C2_u8003" title="参考"></a>参考</h2><p><a href="http://docs.ceph.com/docs/master/radosgw/keystone/" target="_blank" rel="noopener">http://docs.ceph.com/docs/master/radosgw/keystone/</a></p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Radosgw-agent 使用
+  
+</title>
+
+<meta name="description" content="介绍radosgw-agent 同步的数据分为 metasync 和 datasync">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Radosgw-agent 使用">
+<meta property="og:url" content="https://ly798.github.io/2016/01/19/Radosgw-agent-使用/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍radosgw-agent 同步的数据分为 metasync 和 datasync">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Radosgw-agent 使用">
+<meta name="twitter:description" content="介绍radosgw-agent 同步的数据分为 metasync 和 datasync">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Radosgw-agent-使用" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Radosgw-agent 使用
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-01-19
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/01/19/Radosgw-agent-%E4%BD%BF%E7%94%A8/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>radosgw-agent 同步的数据分为 metasync 和 datasync<br> <a id="more"></a> </p>
+<p>radosgw-agent 数据同步场景有两个：</p>
+<ul>
+<li>同一个 region 中，同步 Master zone 的数据到 Secondary zone*   region 之间，同步 Master region 的数据到 Secondary region，且只能是 metasync </li>
+</ul>
+<h2 id="zone-之间的-radosgw-agent-部署注意"><a href="#zone-之间的-radosgw-agent-部署注意" class="headerlink" title="zone 之间的 radosgw-agent 部署注意"></a><a href="https://ly798.github.io/2016/01/19/Radosgw-agent-%E4%BD%BF%E7%94%A8/#zone__u4E4B_u95F4_u7684_radosgw-agent__u90E8_u7F72_u6CE8_u610F" title="zone 之间的 radosgw-agent 部署注意"></a>zone 之间的 radosgw-agent 部署注意</h2><ul>
+<li>在 region set 和 regionmap update 之后，需要重启 ceph-radosgw，否则通过 api 获得的 region map 是未被更新的。</li>
+<li>在未成功配置 zone 的 master 和 slave 之前创建的 user、bucket、object 等都不能被 radosgw-agent 同步。 </li>
+</ul>
+<h2 id="服务启动"><a href="#服务启动" class="headerlink" title="服务启动"></a><a href="https://ly798.github.io/2016/01/19/Radosgw-agent-%E4%BD%BF%E7%94%A8/#u670D_u52A1_u542F_u52A8" title="服务启动"></a>服务启动</h2><p>1.手动启动，显示的指定配置文件，运行的输出也会打印带屏幕</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># radosgw-agent -c &lt;config_file&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>2.服务的方式启动，默认的配置文件是在/etc/ceph/radosgw-agent/default.conf，手动创建并启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/init.d/radosgw-agent start</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a><a href="https://ly798.github.io/2016/01/19/Radosgw-agent-%E4%BD%BF%E7%94%A8/#u914D_u7F6E_u6587_u4EF6" title="配置文件"></a>配置文件</h2><p>配置文件demo</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">src_access_key: NDOO5JZAAM2Z6WA9FIXG</span><br><span class="line">src_secret_key: <span class="number">4</span>rWHptoevPLPlOwDITljxPuJTqoMQCMM9ICBjGgv</span><br><span class="line"><span class="variable">#source</span>: http:<span class="comment">//cd-1:80</span></span><br><span class="line"><span class="variable">#src_zone</span>: cd<span class="attribute">-center1</span></span><br><span class="line">dest_access_key: FLDVEMPT8PKY1F2UD3F7</span><br><span class="line">dest_secret_key: <span class="number">8</span>HnGUZIveuHAWePuGXEDXYTR985m7voSUuQDGPkx</span><br><span class="line">destination: http:<span class="comment">//cd-2:80</span></span><br><span class="line">log_file: /<span class="built_in">var</span>/<span class="keyword">log</span>/radosgw/radosgw<span class="attribute">-sync</span><span class="attribute">-cd</span><span class="attribute">-center1</span><span class="attribute">-center2</span><span class="built_in">.</span><span class="keyword">log</span></span><br><span class="line"><span class="variable">#verbose</span>: <span class="literal">True</span>/<span class="literal">False</span></span><br><span class="line"><span class="variable">#versioned</span>: <span class="literal">True</span>/<span class="literal">False</span></span><br><span class="line"><span class="variable">#sync_scope</span>: <span class="literal">full</span>/incremental</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>verbose：是否打开 debug</li>
+<li>versioned：集群是否开启对象的多版本</li>
+<li>sync_scope：同步方式，full（完全），incremental（增量） </li>
+</ul>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a><a href="https://ly798.github.io/2016/01/19/Radosgw-agent-%E4%BD%BF%E7%94%A8/#u95EE_u9898" title="问题"></a>问题</h2><p>在 radosgw-agent 启动的时候有日志输出：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="link_label">radosgw_agent</span>][<span class="link_reference">INFO </span>] <a href="http://cd-1:80" target="_blank" rel="noopener">http://cd-1:80</a> endpoint does not support versioning</span><br><span class="line">[<span class="link_label">radosgw_agent</span>][<span class="link_reference">WARNIN</span>] encountered issues reaching to endpoint <a href="http://cd-1:80" target="_blank" rel="noopener">http://cd-1:80</a></span><br><span class="line">[<span class="link_label">radosgw_agent</span>][<span class="link_reference">WARNIN</span>] HTTP Error 403:</span><br></pre></td></tr></table></figure>
+
+<p>对应代码：<br>radosgw-agent/cli.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_versioning</span><span class="params">(endpoint)</span>:</span></span><br><span class="line"> date = time.asctime(time.gmtime())</span><br><span class="line"> signed_string = sign_string(endpoint.secret_key, date=date)</span><br><span class="line"> url = str(endpoint) + <span class="string">‘/?versions’</span></span><br><span class="line"> headers = &#123;</span><br><span class="line"> <span class="string">‘Authorization’</span>: <span class="string">‘AWS ‘</span> + endpoint.access_key + <span class="string">‘:’</span> + signed_string,</span><br><span class="line"> <span class="string">‘Date’</span>: date</span><br><span class="line"> &#125;</span><br><span class="line"> data = <span class="keyword">None</span></span><br><span class="line"> req = urllib2.Request(url, data, headers)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> response = urllib2.urlopen(req)</span><br><span class="line"> response.read()</span><br><span class="line"> log.debug(<span class="string">‘%s endpoint supports versioning’</span> % endpoint)</span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line"> <span class="keyword">except</span> HTTPError <span class="keyword">as</span> error:</span><br><span class="line"> <span class="keyword">if</span> error.code == <span class="number">403</span>:</span><br><span class="line"> log.info(<span class="string">‘%s endpoint does not support versioning’</span> % endpoint)</span><br><span class="line"> log.warning(<span class="string">‘encountered issues reaching to endpoint %s’</span> % endpoint)</span><br><span class="line"> log.warning(error)</span><br><span class="line"> <span class="keyword">except</span> URLError <span class="keyword">as</span> error:</span><br><span class="line"> log.error(<span class="string">“was unable to connect to %s”</span> % url)</span><br><span class="line"> log.error(error)</span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">False</span></span><br></pre></td></tr></table></figure>
+
+<p>因为我们没有在配置文件中配置<code>versioned</code>，则会调用方法<code>check_versioning</code>，当前版本的 radosgw 不支持 versioning，所以这个报错是正常的。<br>修改配置文件项</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">versioned</span>: <span class="string">False</span></span><br></pre></td></tr></table></figure>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

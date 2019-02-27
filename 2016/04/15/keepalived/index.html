@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    keepalived
+  
+</title>
+
+<meta name="description" content="介绍keepalived 用于服务的高可用,解决单点故障。基于网络的 VRRP 协议。">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="keepalived">
+<meta property="og:url" content="https://ly798.github.io/2016/04/15/keepalived/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍keepalived 用于服务的高可用,解决单点故障。基于网络的 VRRP 协议。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="keepalived">
+<meta name="twitter:description" content="介绍keepalived 用于服务的高可用,解决单点故障。基于网络的 VRRP 协议。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-keepalived" class="article article-type-post">
+  
+    <h1 class="article-header">
+      keepalived
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-04-15
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>keepalived 用于服务的高可用,解决单点故障。基于网络的 VRRP 协议。<br> <a id="more"></a> </p>
+<h2 id="demo"><a href="#demo" class="headerlink" title="demo"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#demo" title="demo"></a>demo</h2><h3 id="env"><a href="#env" class="headerlink" title="env"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#env" title="env"></a>env</h3><p>三台虚拟机，分别有2张网卡，对应地址如下：</p>
+<p>ha1</p>
+<ul>
+<li>eth1: 172.16.101.4/24<br>ha1</li>
+<li>eth1: 172.16.101.5/24<br>ha1</li>
+<li>eth1: 172.16.101.6/24</li>
+</ul>
+<p>选择一个 vip，172.16.101.10/24</p>
+<h3 id="setting"><a href="#setting" class="headerlink" title="setting"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#setting" title="setting"></a>setting</h3><h4 id="ha1"><a href="#ha1" class="headerlink" title="ha1"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#ha1" title="ha1"></a>ha1</h4><p>配置文件 /etc/keepalived/keepalived.conf</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">vrrp_script check_running &#123;</span><br><span class="line"> script <span class="string">“/etc/keepalived/check_http.sh”</span> <span class="preprocessor"># 执行检查的甲本</span></span><br><span class="line"> interval <span class="number">2</span> </span><br><span class="line"> weight -<span class="number">20</span> <span class="preprocessor"># priority 减少<span class="number">20</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance http &#123;</span><br><span class="line"> state BACKUP</span><br><span class="line"> priority <span class="number">100</span> <span class="preprocessor"># 可理解为权重，高的会被选为master，<span class="number">1</span>-<span class="number">255</span></span></span><br><span class="line"> interface eth1 <span class="preprocessor"># 用来发送VRRP的网卡</span></span><br><span class="line"> virtual_router_id <span class="number">47</span> <span class="preprocessor"># 用来区分多个instance的VRRP组播，<span class="number">0</span>-<span class="number">255</span>，同个集群中的主备这里设置成一样</span></span><br><span class="line"> advert_int <span class="number">3</span> <span class="preprocessor"># 发送VRRP的时间间隔，即进行一次检查</span></span><br><span class="line"> authentication &#123; <span class="preprocessor"># 认证</span></span><br><span class="line"> auth_type PASS</span><br><span class="line"> auth_pass <span class="number">1234</span></span><br><span class="line"> &#125;</span><br><span class="line"> nopreempt <span class="preprocessor"># 设置当故障了重启之后不抢占现在master</span></span><br><span class="line"> virtual_ipaddress &#123; <span class="preprocessor"># VIP</span></span><br><span class="line"> <span class="number">172.16</span><span class="number">.101</span><span class="number">.10</span>/<span class="number">24</span></span><br><span class="line"> &#125;</span><br><span class="line"> virtual_routes&#123;&#125; <span class="preprocessor"># 当IP漂过来之后需要添加的路由</span></span><br><span class="line"> track_script &#123;</span><br><span class="line"> check_running</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>该配置文件有多个配置区域</p>
+<ul>
+<li><code>global_defs</code>、<br>主要配置故障时通知信息，可忽略</li>
+<li><code>static_ipaddress</code>、<br>本节点的ip配置，服务器一般都会有配置，可忽略</li>
+<li><code>static_routes</code>、<br>本节点的route配置，服务器一般都会有配置，可忽略</li>
+<li><code>vrrp_script</code>、<br>健康检查</li>
+<li><code>vrrp_instance</code>、<br>配置vip机器属性</li>
+<li><code>vrrp_sync_group</code><br>配置vrrp_instance组，当某个vrrp_instance切换时，组内都会切换 </li>
+</ul>
+<p>检查脚本/etc/keepalived/check_http.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="shebang">#!/usr/bin/env bash</span></span><br><span class="line">count=<code>netstat -tnlp | grep &lt;span class=&quot;number&quot;&gt;80&lt;/span&gt; | wc &lt;span class=&quot;operator&quot;&gt;-l&lt;/span&gt;</code></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$count</span> <span class="operator">-gt</span> <span class="number">0</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line"> <span class="built_in">exit</span> <span class="number">0</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"> <span class="comment"># 因为我们设置了 nopreempt 不抢占，即使检查到 80 端口不在，也不会抢占为master，这里杀掉keepalived即可。</span></span><br><span class="line"> <code>systemctl stop keepalived</code> </span><br><span class="line"> <span class="built_in">exit</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure><br> <figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># systemctl start keepalived</span></span><br></pre></td></tr></table></figure> 
+
+<h4 id="ha2、ha3"><a href="#ha2、ha3" class="headerlink" title="ha2、ha3"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#ha2_u3001ha3" title="ha2、ha3"></a>ha2、ha3</h4><p>与 ha1 不同的是 /etc/keepalived/keepalived.conf</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vrrp_instance http &#123;</span><br><span class="line"> <span class="attribute">…</span></span><br><span class="line"> priority <span class="number">90</span></span><br><span class="line"> <span class="attribute">…</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="result"><a href="#result" class="headerlink" title="result"></a><a href="https://ly798.github.io/2016/04/15/keepalived/#result" title="result"></a>result</h3><p>查看三台系统的 ip，可发现其中ha1 eth1 绑定了 vip</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># ip a</span></span><br><span class="line">eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span class="number">1500</span> qdisc pfifo_fast state UP qlen <span class="number">1000</span></span><br><span class="line"> link/ether <span class="number">52</span>:<span class="number">54</span>:<span class="number">00</span>:<span class="number">6f</span>:<span class="number">0</span>b:<span class="number">78</span> brd ff:ff:ff:ff:ff:ff</span><br><span class="line"> inet <span class="number">172.16</span><span class="number">.101</span><span class="number">.4</span>/<span class="number">24</span> brd <span class="number">172.16</span><span class="number">.101</span><span class="number">.255</span> scope global eth1</span><br><span class="line"> valid_lft forever preferred_lft forever</span><br><span class="line"> inet <span class="number">172.16</span><span class="number">.101</span><span class="number">.10</span>/<span class="number">24</span> scope global secondary eth1</span><br><span class="line"> valid_lft forever preferred_lft forever</span><br><span class="line"> inet6 fe80::<span class="number">5054</span>:ff:fe6f:b78/<span class="number">64</span> scope link </span><br><span class="line"> valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
+
+<p>停掉 httpd</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># systemctl stop httpd</span></span><br></pre></td></tr></table></figure>
+
+<p>在另外两台有一台被选举为 master，绑定了 vip</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    小米mini 科学上网
+  
+</title>
+
+<meta name="description" content="介绍入手个小米mini，正好也有一个 HongKong vps，采用 mini+PandoraBox+ss 设置路由器智能上外网，实现国内外网络连接分流，即保证速度，也保证 vps 流量消耗。">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小米mini 科学上网">
+<meta property="og:url" content="https://ly798.github.io/2016/01/02/小米mini-科学上网/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍入手个小米mini，正好也有一个 HongKong vps，采用 mini+PandoraBox+ss 设置路由器智能上外网，实现国内外网络连接分流，即保证速度，也保证 vps 流量消耗。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小米mini 科学上网">
+<meta name="twitter:description" content="介绍入手个小米mini，正好也有一个 HongKong vps，采用 mini+PandoraBox+ss 设置路由器智能上外网，实现国内外网络连接分流，即保证速度，也保证 vps 流量消耗。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-小米mini-科学上网" class="article article-type-post">
+  
+    <h1 class="article-header">
+      小米mini 科学上网
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-01-02
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>入手个小米mini，正好也有一个 HongKong vps，采用 mini+PandoraBox+ss 设置路由器智能上外网，实现国内外网络连接分流，即保证速度，也保证 vps 流量消耗。<br> <a id="more"></a> </p>
+<h2 id="刷入系统"><a href="#刷入系统" class="headerlink" title="刷入系统"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#u5237_u5165_u7CFB_u7EDF" title="刷入系统"></a>刷入系统</h2><ol>
+<li><a href="http://www1.miwifi.com/miwifi_download.html" target="_blank" rel="noopener">http://www1.miwifi.com/miwifi_download.html</a> 下载对应的最新的 mini 开发版本的ROM，通过 web 界面刷入开发版本的 ROM</li>
+<li><a href="http://www1.miwifi.com/miwifi_open.html" target="_blank" rel="noopener">http://www1.miwifi.com/miwifi_open.html</a> 开启ssh，打开22端口，获得 root 密码</li>
+<li>通过 ssh 工具（windows putty）进入 mini 系统</li>
+<li><a href="http://downloads.openwrt.org.cn/PandoraBox/Xiaomi-Mini-R1CM/stable/PandoraBox-ralink-mt7620-xiaomi-mini-squashfs-sysupgrade-r1024-20150608.bin" target="_blank" rel="noopener">PandoraBox R2 14.09 / LuCI Trunk (0.12+svn-r1024)</a> 下载到 mini 系统 /tmp 下，下载该版本是为了避免诸多软件源问题</li>
+<li>进入 mini 系统，开始刷入 PandoraBox 命令 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mtd -r write /tmp/PandoraBox-ralink-mt7620-xiaomi-mini-squashfs-sysupgrade-r1024-<span class="number">20150608</span>.bin firmwarei</span><br></pre></td></tr></table></figure>6.  可以登入系统 PandoraBox 系统了，默认用户 root，密码 admin </li>
+</ol>
+<h2 id="配置系统和服务"><a href="#配置系统和服务" class="headerlink" title="配置系统和服务"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#u914D_u7F6E_u7CFB_u7EDF_u548C_u670D_u52A1" title="配置系统和服务"></a>配置系统和服务</h2><h3 id="路由器系统基本环境"><a href="#路由器系统基本环境" class="headerlink" title="路由器系统基本环境"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#u8DEF_u7531_u5668_u7CFB_u7EDF_u57FA_u672C_u73AF_u5883" title="路由器系统基本环境"></a>路由器系统基本环境</h3><ol>
+<li>修改系统密码，也是 web 登陆密码，<code>passwd</code></li>
+<li>默认ip是192.168.1.1，为避免ip与家庭上级路由器冲突，拔掉路由器的网线，并登陆修改 LAN ip</li>
+<li>插网线保证路由器能够上网，修改软件源为：(可在web界面设置)<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dest root /</span><br><span class="line">dest ram /tmp</span><br><span class="line">lists_dir ext <span class="regexp">/var/</span>opkg-lists</span><br><span class="line">option overlay_root /overlay</span><br><span class="line">src<span class="regexp">/gz 14.09_base http:/</span><span class="regexp">/downloads.pandorabox.org.cn/</span>pandorabox<span class="regexp">/ralink/</span>mt7621<span class="regexp">/packages/</span>base</span><br></pre></td></tr></table></figure> </li>
+</ol>
+<h3 id="vps-上配置-shadowsocks-libev-服务端"><a href="#vps-上配置-shadowsocks-libev-服务端" class="headerlink" title="vps 上配置 shadowsocks-libev 服务端"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#vps__u4E0A_u914D_u7F6E_shadowsocks-libev__u670D_u52A1_u7AEF" title="vps 上配置 shadowsocks-libev 服务端"></a>vps 上配置 shadowsocks-libev 服务端</h3><ol>
+<li>安装编译环境<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y gcc automake autoconf libtool make build-essential autoconf libtool curl curl-devel unzip zlib-devel openssl-devel perl perl-devel cpio expat-devel gettext-devel</span><br></pre></td></tr></table></figure>2.  获取源码<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget <a href="https://github.com/shadowsocks/shadowsocks-libev/archive/master.zip" target="_blank" rel="noopener">https://github.com/shadowsocks/shadowsocks-libev/archive/master.zip</a></span><br></pre></td></tr></table></figure>3.  编译安装<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">unzip master.zip</span><br><span class="line"><span class="built_in">cd</span> shadowsocks-libev-master/</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure –prefix=/usr &amp;&amp; make./configure –prefix=/usr &amp;&amp; make./configure –prefix=/usr &amp;&amp; make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>4.  配置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/shadowsocks-libev</span><br><span class="line">cp ./rpm/SOURCES/etc/init.d/shadowsocks-libev /etc/init.d/shadowsocks-libev</span><br><span class="line">cp ./debian/config.json /etc/shadowsocks-libev/config.json</span><br><span class="line">chmod +x /etc/init.d/shadowsocks-libev</span><br><span class="line">vim /etc/shadowsocks-libev/config.json <span class="comment">#ss 配置移步<a href="https://github.com/shadowsocks/shadowsocks/wiki/Configuration-via-Config-File" target="_blank" rel="noopener">https://github.com/shadowsocks/shadowsocks/wiki/Configuration-via-Config-File</a></span></span><br><span class="line">service shadowsocks-libev start</span><br><span class="line">service shadowsocks-libev <span class="built_in">enable</span></span><br></pre></td></tr></table></figure> 
+
+</li>
+</ol>
+<h3 id="PandoraBox-上配置-shadowsocks-libev-客户端"><a href="#PandoraBox-上配置-shadowsocks-libev-客户端" class="headerlink" title="PandoraBox 上配置 shadowsocks-libev 客户端"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#PandoraBox__u4E0A_u914D_u7F6E_shadowsocks-libev__u5BA2_u6237_u7AEF" title="PandoraBox 上配置 shadowsocks-libev 客户端"></a>PandoraBox 上配置 shadowsocks-libev 客户端</h3><ol>
+<li>安装<br>shadowsocks-libev，该系统软件源中已有此软件，安装即可，另外安装 wget、curl</li>
+<li>配置 dnsmasq 转发国内域名<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir /etc/dnsmasq.d</span><br><span class="line"><span class="built_in">echo</span> <span class="string">“conf-dir=/etc/dnsmasq.d”</span> &gt;&gt; /etc/dnsmasq.conf</span><br><span class="line"><span class="built_in">cd</span> /etc/dnsmasq.d</span><br><span class="line"><span class="comment"># 感谢该作者提供 dnsmasq-china-list，若使用 wget 不能下载，可以暂时自行下载在上传</span></span><br><span class="line">wget -<span class="number">4</span> –no-check-certificate -O /etc/dnsmasq.d/accelerated-domains.china.conf <a href="https://github.com/felixonmars/dnsmasq-china-list/raw/master/accelerated-domains.china.conf" target="_blank" rel="noopener">https://github.com/felixonmars/dnsmasq-china-list/raw/master/accelerated-domains.china.conf</a></span><br><span class="line">wget -<span class="number">4</span> –no-check-certificate -O /etc/dnsmasq.d/bogus-nxdomain.china.conf <a href="https://github.com/felixonmars/dnsmasq-china-list/raw/master/accelerated-domains.china.conf" target="_blank" rel="noopener">https://github.com/felixonmars/dnsmasq-china-list/raw/master/accelerated-domains.china.conf</a></span><br><span class="line">/etc/dnsmasq.d<span class="comment"># echo “server=/#/127.0.0.1#3210” &gt; gfwlist.conf #其他的域名通过ss</span></span><br></pre></td></tr></table></figure>3.  修改启动脚本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/init.d/shadowsocks</span><br></pre></td></tr></table></figure> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/sh /etc/rc.common</span></span><br><span class="line"><span class="comment"># Copyright (C) 2006-2011 OpenWrt.org</span></span><br><span class="line"></span><br><span class="line">START=<span class="number">95</span></span><br><span class="line"></span><br><span class="line">SERVICE_USE_PID=<span class="number">1</span></span><br><span class="line">SERVICE_WRITE_PID=<span class="number">1</span></span><br><span class="line">SERVICE_DAEMONIZE=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;</span><br><span class="line"> sed -i <span class="string">‘s/^#conf-dir=\/etc\/dnsmasq.d/conf-dir=\/etc\/dnsmasq.d/‘</span> /etc/dnsmasq.conf</span><br><span class="line"> /etc/init.d/dnsmasq restart</span><br><span class="line"></span><br><span class="line"> service_start /usr/bin/ss-redir -b <span class="number">0.0</span>.<span class="number">0.0</span> -c /etc/shadowsocks.json <span class="operator">-f</span> /var/run/shadowsocks.pid</span><br><span class="line"> service_start /usr/bin/ss-tunnel -b <span class="number">0.0</span>.<span class="number">0.0</span> -c /etc/shadowsocks.json <span class="operator">-l</span> <span class="number">3210</span> -L <span class="number">8.8</span>.<span class="number">8.8</span>:<span class="number">53</span> -u </span><br><span class="line"> /usr/bin/shadowsocks-firewall</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;</span><br><span class="line"> sed -i <span class="string">‘s/^conf-dir=\/etc\/dnsmasq.d/#conf-dir=\/etc\/dnsmasq.d/‘</span> /etc/dnsmasq.conf</span><br><span class="line"> /etc/init.d/dnsmasq restart</span><br><span class="line"></span><br><span class="line"> service_stop /usr/bin/ss-redir</span><br><span class="line"> service_stop /usr/bin/ss-tunnel</span><br><span class="line"> /etc/init.d/firewall restart</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>4.  配置iptables防火墙转发IP和端口<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/bin</span><br><span class="line">touch shadowsocks-firewall</span><br><span class="line">chmod +x shadowsocks-firewall</span><br><span class="line">vi shadowsocks-firewall</span><br></pre></td></tr></table></figure><br> 注意下面的 1.0.9.8 修改为vps 的 ip<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="shebang">#!/bin/sh</span><br><span class="line"></span></span><br><span class="line"><span class="comment"># Author: <a href="https://github.com/softwaredownload/openwrt-fanqiang" target="_blank" rel="noopener">https://github.com/softwaredownload/openwrt-fanqiang</a></span></span><br><span class="line"><span class="comment"># Date: 2015-12-23</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#create a new chain named SHADOWSOCKS</span></span><br><span class="line">iptables -t nat -N SHADOWSOCKS</span><br><span class="line">iptables -t nat -N SHADOWSOCKS_WHITELIST</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ignore your shadowsocks server’s addresses</span></span><br><span class="line"><span class="comment"># It’s very IMPORTANT, just be careful.</span></span><br><span class="line"></span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">1.0</span>.<span class="number">9.8</span> -j RETURN</span><br><span class="line"></span><br><span class="line"><span class="comment">#for hulu.com</span></span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp –dport <span class="number">1935</span> -j REDIRECT –to-ports <span class="number">7654</span></span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p udp –dport <span class="number">1935</span> -j REDIRECT –to-ports <span class="number">7654</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Ignore LANs IP address</span></span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">0.0</span>.<span class="number">0.0</span>/<span class="number">8</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">10.0</span>.<span class="number">0.0</span>/<span class="number">8</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">127.0</span>.<span class="number">0.0</span>/<span class="number">8</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">169.254</span>.<span class="number">0.0</span>/<span class="number">16</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">172.16</span>.<span class="number">0.0</span>/<span class="number">12</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">192.168</span>.<span class="number">0.0</span>/<span class="number">16</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">224.0</span>.<span class="number">0.0</span>/<span class="number">4</span> -j RETURN</span><br><span class="line">iptables -t nat -A SHADOWSOCKS <span class="operator">-d</span> <span class="number">240.0</span>.<span class="number">0.0</span>/<span class="number">4</span> -j RETURN</span><br><span class="line"></span><br><span class="line"><span class="comment"># Check whitelist</span></span><br><span class="line">iptables -t nat -A SHADOWSOCKS -j SHADOWSOCKS_WHITELIST</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -m mark –mark <span class="number">1</span> -j RETURN</span><br><span class="line"></span><br><span class="line"><span class="comment"># Anything else should be redirected to shadowsocks’s local port</span></span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -j REDIRECT –to-ports <span class="number">7654</span></span><br><span class="line"><span class="comment"># Apply the rules</span></span><br><span class="line">iptables -t nat -A PREROUTING -p tcp -j SHADOWSOCKS</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ignore China IP address</span></span><br><span class="line"><span class="keyword">for</span> white_ip <span class="keyword">in</span> <code>cat /etc/chinadns_chnroute.txt</code>;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"> iptables -t nat -A SHADOWSOCKS_WHITELIST <span class="operator">-d</span> <span class="string">“<span class="variable">$&#123;white_ip&#125;</span>“</span> -j MARK –set-mark <span class="number">1</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Ignore Asia IP address</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 1.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 14.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 27.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 36.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 39.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 42.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 49.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 58.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 59.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 60.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 61.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 101.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 103.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 106.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 110.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 111.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 112.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 113.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 114.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 115.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 116.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 117.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 118.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 119.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 120.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 121.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 122.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 123.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 124.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 125.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 126.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 169.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 175.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 180.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 182.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 183.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 202.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 203.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 210.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 211.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 218.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 219.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 220.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 221.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 222.0.0.0/8 -j MARK –set-mark 1</span></span><br><span class="line"><span class="comment">#iptables -t nat -A SHADOWSOCKS_WHITELIST -d 223.0.0.0/8 -j MARK –set-mark 1</span></span><br></pre></td></tr></table></figure> 
+</li>
+</ol>
+<ul>
+<li>启动服务<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/shadowsocks start</span><br><span class="line">/etc/init.d/shadowsocks <span class="built_in">enable</span></span><br></pre></td></tr></table></figure> </li>
+</ul>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a><a href="https://ly798.github.io/2016/01/02/%E5%B0%8F%E7%B1%B3mini-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/#u6700_u540E" title="最后"></a>最后</h2><p>连接路由器的所有终端设备都可以智能的科学上网，国内外分流。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

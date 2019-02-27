@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Radosgw-agent 源码分析
+  
+</title>
+
+<meta name="description" content="介绍在同步数据的时候分别对 source、destination 进行抓包，对应源码进行分析。">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Radosgw-agent 源码分析">
+<meta property="og:url" content="https://ly798.github.io/2016/01/25/Radosgw-agent-源码分析/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍在同步数据的时候分别对 source、destination 进行抓包，对应源码进行分析。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Radosgw-agent 源码分析">
+<meta name="twitter:description" content="介绍在同步数据的时候分别对 source、destination 进行抓包，对应源码进行分析。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Radosgw-agent-源码分析" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Radosgw-agent 源码分析
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-01-25
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>在同步数据的时候分别对 source、destination 进行抓包，对应源码进行分析。<br> <a id="more"></a> </p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#u6E90_u7801_u5206_u6790" title="源码分析"></a>源码分析</h2><h3 id="radosgw-agent-cli-py-main"><a href="#radosgw-agent-cli-py-main" class="headerlink" title="radosgw-agent/cli.py:main()"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#radosgw-agent/cli-py_3Amain_28_29" title="radosgw-agent/cli.py:main()"></a>radosgw-agent/cli.py:main()</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line"> <span class="comment"># 设置 logger、日志等级</span></span><br><span class="line"> …</span><br><span class="line"> <span class="comment"># 解析 args，获得配置项</span></span><br><span class="line"> …</span><br><span class="line"> <span class="comment"># 获得 regionmap，对应的 api 是 /admin/config </span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> region_map = client.get_region_map(dest_conn)</span><br><span class="line"> <span class="keyword">except</span> AgentError:</span><br><span class="line"> …</span><br><span class="line"> <span class="comment"># 配置 endpoint，其中会进行检查 master 或 secondary</span></span><br><span class="line"> client.configure_endpoints(region_map, dest, src, args.metadata_only)</span><br><span class="line"> <span class="comment"># test_server</span></span><br><span class="line"> …</span><br><span class="line"> <span class="comment"># 数据同步</span></span><br><span class="line"> <span class="comment">## 初始化 meta_syncer、data_syncer</span></span><br><span class="line"> …</span><br><span class="line"> <span class="comment">## prepare_sync</span></span><br><span class="line"> sync.prepare_sync(meta_syncer, args.prepare_error_delay)</span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> args.metadata_only:</span><br><span class="line"> sync.prepare_sync(data_syncer, args.prepare_error_delay)</span><br><span class="line"> <span class="comment">## sync</span></span><br><span class="line"> <span class="keyword">if</span> args.sync_scope == <span class="string">‘full’</span>:</span><br><span class="line"> log.info(<span class="string">‘syncing all metadata’</span>)</span><br><span class="line"> meta_syncer.sync(args.num_workers, args.lock_timeout)</span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> args.metadata_only:</span><br><span class="line"> log.info(<span class="string">‘syncing all data’</span>)</span><br><span class="line"> data_syncer.sync(args.num_workers, args.lock_timeout)</span><br><span class="line"> log.info(<span class="string">‘Finished full sync. Check logs to see any issues that ‘</span></span><br><span class="line"> <span class="string">‘incremental sync will retry.’</span>)</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> sync.incremental_sync(meta_syncer, data_syncer,</span><br><span class="line"> args.num_workers,</span><br><span class="line"> args.lock_timeout,</span><br><span class="line"> args.incremental_sync_delay,</span><br><span class="line"> args.metadata_only,</span><br><span class="line"> args.prepare_error_delay)</span><br></pre></td></tr></table></figure> 
+
+<h3 id="prepare-sync"><a href="#prepare-sync" class="headerlink" title="prepare_sync"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#prepare_sync" title="prepare_sync"></a>prepare_sync</h3><p>以 meta_syncer 为例<br>/radosgw-agent/sync.py:class IncrementalSyncer(Syncer)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">prepare</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="comment"># src 的 shards ，对应的方法是 self.num_shards = client.num_log_shards(self.src_conn, self.type)</span></span><br><span class="line"> <span class="comment"># 该方法使用的 api 是 /admin/log?type=metadata</span></span><br><span class="line"> <span class="comment"># 得到的结果类似 &#123;”num_objects”:64&#125;</span></span><br><span class="line"> self.init_num_shards()</span><br><span class="line"> self.shard_info = &#123;&#125;</span><br><span class="line"> self.shard_work = &#123;&#125;</span><br><span class="line"> <span class="keyword">for</span> shard_num <span class="keyword">in</span> xrange(self.num_shards):</span><br><span class="line"> marker, retries = self.get_worker_bound(shard_num)</span><br><span class="line"> last_marker, log_entries = self.get_log_entries(shard_num, marker)</span><br><span class="line"> self.shard_work[shard_num] = log_entries, retries</span><br><span class="line"> self.shard_info[shard_num] = last_marker</span><br><span class="line"> self.prepared_at = time.time()</span><br></pre></td></tr></table></figure>
+
+<p>对于上面代码</p>
+<ol>
+<li>获取 dest 的 bound <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">marker, retries = self.get_worker_bound(shard_num)</span><br></pre></td></tr></table></figure><br> 获取 dest 的 bound，对应的 api 是 /admin/replica_log?bounds&amp;type=data&amp;id=0<br>得到的结果是<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> “<span class="attribute">marker</span>“: <span class="value"><span class="string">“1_1453184408.808048_5.1”</span></span>, </span><br><span class="line"> “<span class="attribute">oldest_time</span>“: <span class="value"><span class="string">“0.000000”</span></span>, </span><br><span class="line"> “<span class="attribute">markers</span>“: <span class="value">[</span><br><span class="line"> &#123;</span><br><span class="line"> “<span class="attribute">entity</span>“: <span class="value"><span class="string">“radosgw-agent”</span></span>, </span><br><span class="line"> “<span class="attribute">position_marker</span>“: <span class="value"><span class="string">“1_1453184408.808048_5.1”</span></span>, </span><br><span class="line"> “<span class="attribute">position_time</span>“: <span class="value"><span class="string">“0.000000”</span></span>, </span><br><span class="line"> “<span class="attribute">items_in_progress</span>“: <span class="value">[ ]</span><br><span class="line"> </span>&#125;</span><br><span class="line"> ]</span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure><br> 或<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;”<span class="attribute">Code</span>“:<span class="value"><span class="string">“NoSuchKey”</span></span>&#125;</span><br></pre></td></tr></table></figure><br> marker, retries 都为空</li>
+<li>获取 src 的 log_entries<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">last_marker, log_entries = self.get_log_entries(shard_num, marker)</span><br></pre></td></tr></table></figure><br> 获取 src 的 log_entries，对应的 api 是 /admin/log?marker=%20&amp;type=metadata&amp;id=0&amp;max-entries=1000<br>得到的结果一个 marker，包含许多的 entries<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> “<span class="attribute">marker</span>“: <span class="value"><span class="string">“1_1453461773.098122_674.1”</span></span>, </span><br><span class="line"> “<span class="attribute">truncated</span>“: <span class="value"><span class="literal">false</span></span>, </span><br><span class="line"> “<span class="attribute">entries</span>“: <span class="value">[</span><br><span class="line"> &#123;</span><br><span class="line"> “<span class="attribute">id</span>“: <span class="value"><span class="string">“1_1448948065.089679_11.1”</span></span>, </span><br><span class="line"> “<span class="attribute">section</span>“: <span class="value"><span class="string">“bucket.instance”</span></span>, </span><br><span class="line"> “<span class="attribute">name</span>“: <span class="value"><span class="string">“pengdake_test:center-1.5447.2”</span></span>, </span><br><span class="line"> “<span class="attribute">timestamp</span>“: <span class="value"><span class="string">“2015-12-01 05:34:25.089679Z”</span></span>, </span><br><span class="line"> “<span class="attribute">data</span>“: <span class="value">&#123;</span><br><span class="line"> “<span class="attribute">read_version</span>“: <span class="value">&#123;</span><br><span class="line"> “<span class="attribute">tag</span>“: <span class="value"><span class="string">“”</span></span>, </span><br><span class="line"> “<span class="attribute">ver</span>“: <span class="value"><span class="number">0</span></span><br><span class="line"> </span>&#125;</span>, </span><br><span class="line"> “<span class="attribute">write_version</span>“: <span class="value">&#123;</span><br><span class="line"> “<span class="attribute">tag</span>“: <span class="value"><span class="string">“_yl8VxMaeEnZZpEAZE-M9vwX”</span></span>, </span><br><span class="line"> “<span class="attribute">ver</span>“: <span class="value"><span class="number">1</span></span><br><span class="line"> </span>&#125;</span>, </span><br><span class="line"> “<span class="attribute">status</span>“: <span class="value">&#123;</span><br><span class="line"> “<span class="attribute">status</span>“: <span class="value"><span class="string">“write”</span></span><br><span class="line"> </span>&#125;</span><br><span class="line"> </span>&#125;</span><br><span class="line"> </span>&#125;, …</span></span><br></pre></td></tr></table></figure> 
+
+</li>
+</ol>
+<h3 id="sync"><a href="#sync" class="headerlink" title="sync"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#sync" title="sync"></a>sync</h3><p>考虑 incremental 方式，radosgw-agent/sync.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">incremental_sync</span><span class="params">(meta_syncer, data_syncer, num_workers, lock_timeout,</span><br><span class="line"> incremental_sync_delay, metadata_only, error_delay)</span>:</span></span><br><span class="line"> <span class="string">“””Run a continuous incremental sync.</span><br><span class="line"></span><br><span class="line"> This will run forever, pausing between syncs by a</span><br><span class="line"> incremental_sync_delay seconds.</span><br><span class="line"> “””</span></span><br><span class="line"> <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> meta_syncer.sync(num_workers, lock_timeout)</span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> metadata_only:</span><br><span class="line"> data_syncer.sync(num_workers, lock_timeout)</span><br><span class="line"> <span class="keyword">except</span> Exception:</span><br><span class="line"> log.warn(<span class="string">‘error doing incremental sync, will try again. Traceback:’</span>,</span><br><span class="line"> exc_info=<span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line"> <span class="comment"># prepare data before sleeping due to rgw_log_bucket_window</span></span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> metadata_only:</span><br><span class="line"> prepare_sync(data_syncer, error_delay)</span><br><span class="line"> log.info(<span class="string">‘waiting %d seconds until next sync’</span>,</span><br><span class="line"> incremental_sync_delay)</span><br><span class="line"> time.sleep(incremental_sync_delay)</span><br><span class="line"> prepare_sync(meta_syncer, error_delay)</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>初始化<br>其中<code>meta_syncer.sync(num_workers, lock_timeout)</code>，最终方法是radosgw-agent/sync.py:class Syncer()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync</span><span class="params">(self, num_workers, log_lock_time)</span>:</span></span><br><span class="line"> <span class="comment"># 初始化 multiprocessing，并启动</span></span><br><span class="line"> workQueue = multiprocessing.Queue()</span><br><span class="line"> resultQueue = multiprocessing.Queue()</span><br><span class="line"> processes = [self.worker_cls(workQueue,</span><br><span class="line"> resultQueue,</span><br><span class="line"> log_lock_time,</span><br><span class="line"> self.src,</span><br><span class="line"> self.dest,</span><br><span class="line"> daemon_id=self.daemon_id,</span><br><span class="line"> max_entries=self.max_entries,</span><br><span class="line"> object_sync_timeout=self.object_sync_timeout,</span><br><span class="line"> )</span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> xrange(num_workers)]</span><br><span class="line"> <span class="keyword">for</span> process <span class="keyword">in</span> processes:</span><br><span class="line"> process.daemon = <span class="keyword">True</span></span><br><span class="line"> process.start()</span><br><span class="line"> self.wait_until_ready()</span><br><span class="line"> log.info(<span class="string">‘Starting sync’</span>)</span><br><span class="line"> <span class="comment"># enqueue the shards to be synced</span></span><br><span class="line"> <span class="comment"># 将 shards 放入队列</span></span><br><span class="line"> num_items = <span class="number">0</span></span><br><span class="line"> <span class="keyword">for</span> item <span class="keyword">in</span> self.generate_work():</span><br><span class="line"> num_items += <span class="number">1</span></span><br><span class="line"> workQueue.put(item)</span><br><span class="line"> <span class="comment"># add a poison pill for each worker</span></span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> xrange(num_workers):</span><br><span class="line"> workQueue.put(<span class="keyword">None</span>)</span><br><span class="line"> <span class="comment"># pull the results out as they are produced</span></span><br><span class="line"> <span class="comment"># 获取处理的结果</span></span><br><span class="line"> retries = &#123;&#125;</span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> xrange(num_items):</span><br><span class="line"> result, item = resultQueue.get()</span><br><span class="line"> shard_num, retries = item</span><br><span class="line"> <span class="keyword">if</span> result == worker.RESULT_SUCCESS:</span><br><span class="line"> log.debug(<span class="string">‘synced item %r successfully’</span>, item)</span><br><span class="line"> self.complete_item(shard_num, retries)</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> log.error(<span class="string">‘error syncing shard %d’</span>, shard_num)</span><br><span class="line"> retries.append(shard_num)</span><br><span class="line"> log.info(<span class="string">‘%d/%d items processed’</span>, i + <span class="number">1</span>, num_items)</span><br><span class="line"> <span class="keyword">if</span> retries:</span><br><span class="line"> log.error(<span class="string">‘Encountered errors syncing these %d shards: %r’</span>,</span><br><span class="line"> len(retries), retries)</span><br></pre></td></tr></table></figure>2.  同步<br>对于上 1 中的代码，<code>self.generate_work()</code>对应的是：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_work</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> self.shard_work.iteritems()</span><br></pre></td></tr></table></figure><br> 这里的 shard_work 就是上述 prepare 中的 shard_work，其对应的格式是<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shard_num, (<span class="built_in">log</span>_entries, retries)</span><br></pre></td></tr></table></figure><br> 将其放入队列后，process 就的得到一个 work，进行 process.start()，对应的方法是<br>radosgw-agent/worker.py:class IncrementalMixin()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line"> self.prepare_lock()</span><br><span class="line"> <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"> <span class="comment"># 获得 shard_work 中的一个</span></span><br><span class="line"> item = self.work_queue.get()</span><br><span class="line"> <span class="keyword">if</span> item <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line"> dev_log.info(<span class="string">‘process %s is done. Exiting’</span>, self.ident)</span><br><span class="line"> <span class="keyword">break</span></span><br><span class="line"> shard_num, (log_entries, retries) = item</span><br><span class="line"> log.info(<span class="string">‘%s is processing shard number %d’</span>,</span><br><span class="line"> self.ident, shard_num)</span><br><span class="line"> <span class="comment"># first, lock the log</span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> self.lock_shard(shard_num)</span><br><span class="line"> <span class="keyword">except</span> SkipShard:</span><br><span class="line"> <span class="keyword">continue</span></span><br><span class="line"> result = RESULT_SUCCESS</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># 同步</span></span><br><span class="line"> new_retries = self.sync_entries(log_entries, retries)</span><br><span class="line"> <span class="keyword">except</span> Exception:</span><br><span class="line"> log.exception(<span class="string">‘syncing entries for shard %d failed’</span>,</span><br><span class="line"> shard_num)</span><br><span class="line"> result = RESULT_ERROR</span><br><span class="line"> new_retries = []</span><br><span class="line"> <span class="comment"># finally, unlock the log</span></span><br><span class="line"> self.unlock_shard()</span><br><span class="line"> self.result_queue.put((result, (shard_num, new_retries)))</span><br><span class="line"> log.info(<span class="string">‘finished processing shard %d’</span>, shard_num)</span><br></pre></td></tr></table></figure><br> 如上代码中<code>new_retries = self.sync_entries(log_entries, retries)</code>对应的是<br>radosgw-agent/worker.py:class IncrementalMixin()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync_entries</span><span class="params">(self, log_entries, retries)</span>:</span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># 整理 entries 中的每一个 entry</span></span><br><span class="line"> entries = [_meta_entry_from_json(entry) <span class="keyword">for</span> entry <span class="keyword">in</span> log_entries]</span><br><span class="line"> <span class="keyword">except</span> KeyError:</span><br><span class="line"> log.error(<span class="string">‘log containing bad key is: %s’</span>, log_entries)</span><br><span class="line"> <span class="keyword">raise</span></span><br><span class="line"> new_retries = []</span><br><span class="line"> <span class="comment"># 取 entry 的 [section, name] 并去重</span></span><br><span class="line"> mentioned = set([(entry.section, entry.name) <span class="keyword">for</span> entry <span class="keyword">in</span> entries])</span><br><span class="line"> <span class="comment"># 整理 bound</span></span><br><span class="line"> split_retries = [tuple(entry.split(<span class="string">‘/‘</span>, <span class="number">1</span>)) <span class="keyword">for</span> entry <span class="keyword">in</span> retries]</span><br><span class="line"> <span class="comment"># 组合并同步</span></span><br><span class="line"> <span class="keyword">for</span> section, name <span class="keyword">in</span> mentioned.union(split_retries):</span><br><span class="line"> sync_result = self.sync_meta(section, name)</span><br><span class="line"> <span class="comment"># 同步失败的将返回，下一次将重试</span></span><br><span class="line"> <span class="keyword">if</span> sync_result == RESULT_ERROR:</span><br><span class="line"> new_retries.append(section + <span class="string">‘/‘</span> + name)</span><br><span class="line"> <span class="keyword">return</span> new_retries</span><br></pre></td></tr></table></figure><br> 如上代码中<code>sync_result = self.sync_meta(section, name)</code>对应的是<br>radosgw-agent/worker.py:class MetadataWorker(Worker)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync_meta</span><span class="params">(self, section, name)</span>:</span></span><br><span class="line"> log.debug(<span class="string">‘syncing metadata type %s key “%s”‘</span>, section, name)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># 获取 source 的 某个 metadata</span></span><br><span class="line"> metadata = client.get_metadata(self.src_conn, section, name)</span><br><span class="line"> <span class="keyword">except</span> NotFound:</span><br><span class="line"> log.debug(<span class="string">‘%s “%s” not found on master, deleting from secondary’</span>,</span><br><span class="line"> section, name)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># 若没有找到，则在 dest 上删除</span></span><br><span class="line"> client.delete_metadata(self.dest_conn, section, name)</span><br><span class="line"> <span class="keyword">except</span> NotFound:</span><br><span class="line"> <span class="comment"># Since this error is handled appropriately, return success</span></span><br><span class="line"> <span class="keyword">return</span> RESULT_SUCCESS</span><br><span class="line"> <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line"> log.warn(<span class="string">‘error getting metadata for %s “%s”: %s’</span>,</span><br><span class="line"> section, name, e, exc_info=<span class="keyword">True</span>)</span><br><span class="line"> <span class="keyword">return</span> RESULT_ERROR</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># 更新 metadata</span></span><br><span class="line"> client.update_metadata(self.dest_conn, section, name, metadata)</span><br><span class="line"> <span class="keyword">return</span> RESULT_SUCCESS</span><br><span class="line"> <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line"> log.warn(<span class="string">‘error updating metadata for %s “%s”: %s’</span>,</span><br><span class="line"> section, name, e, exc_info=<span class="keyword">True</span>)</span><br><span class="line"> <span class="keyword">return</span> RESULT_ERROR</span><br></pre></td></tr></table></figure>3.  获取处理结果<br>其代码是<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">retries = &#123;&#125;</span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> xrange(num_items):</span><br><span class="line"> result, item = resultQueue.get()</span><br><span class="line"> shard_num, retries = item</span><br><span class="line"> <span class="keyword">if</span> result == worker.RESULT_SUCCESS:</span><br><span class="line"> log.debug(<span class="string">‘synced item %r successfully’</span>, item)</span><br><span class="line"> self.complete_item(shard_num, retries)</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> log.error(<span class="string">‘error syncing shard %d’</span>, shard_num)</span><br><span class="line"> retries.append(shard_num)</span><br><span class="line"> log.info(<span class="string">‘%d/%d items processed’</span>, i + <span class="number">1</span>, num_items)</span><br><span class="line"> <span class="keyword">if</span> retries:</span><br><span class="line"> log.error(<span class="string">‘Encountered errors syncing these %d shards: %r’</span>,</span><br><span class="line"> len(retries), retries)</span><br></pre></td></tr></table></figure><br> 从 queue 中去的一个处理结果，<br>若失败，报错,<br>若成功，执行<code>self.complete_item(shard_num, retries)</code>，<br>radosgw-agent/sync.py:class Syncer(object)</p>
+<pre><code>&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;complete_item&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(self, shard_num, retries)&lt;/span&gt;:&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;&quot;&quot;Called when syncing a single item completes successfully&quot;&quot;&quot;&lt;/span&gt; marker = self.shard_info.get(shard_num) &lt;span class=&quot;comment&quot;&gt;# 获取该 shard_num 的 marker，若没有 shard_num，则返回空&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;not&lt;/span&gt; marker: &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;try&lt;/span&gt;: &lt;span class=&quot;comment&quot;&gt;# post 该 shard 的 bound&lt;/span&gt; data = [dict(name=retry, time=worker.DEFAULT_TIME) &lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; retry &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; retries] client.set_worker_bound(self.dest_conn, self.type, marker, worker.DEFAULT_TIME, self.daemon_id, shard_num, data) &lt;span class=&quot;keyword&quot;&gt;except&lt;/span&gt; Exception: log.warn(&lt;span class=&quot;string&quot;&gt;&apos;could not set worker bounds, may repeat some work.&apos;&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&apos;Traceback:&apos;&lt;/span&gt;, exc_info=&lt;span class=&quot;keyword&quot;&gt;True&lt;/span&gt;) 
+</code></pre></li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><a href="https://ly798.github.io/2016/01/25/Radosgw-agenti-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#u603B_u7ED3" title="总结"></a>总结</h2><ul>
+<li>在 sync 中 2. 同步 中<code>return new_retries</code>，同步失败的将返回，若没有失败的则返回空；<br>当获取处理结果的时候，从 queue 中获得该 retries，根据 shard_num 来 post admin/replica_log。</li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

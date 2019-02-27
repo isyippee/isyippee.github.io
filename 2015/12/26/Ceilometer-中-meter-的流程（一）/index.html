@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Ceilometer 中 meter 的流程（一）
+  
+</title>
+
+<meta name="description" content="介绍在 ceilometer 中一个 meter 的生命周期可以大概归纳为：  meter 的采集 meter 的存储 meter 的查询">
+<meta name="keywords" content="openstack,ceilometer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceilometer 中 meter 的流程（一）">
+<meta property="og:url" content="https://ly798.github.io/2015/12/26/Ceilometer-中-meter-的流程（一）/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍在 ceilometer 中一个 meter 的生命周期可以大概归纳为：  meter 的采集 meter 的存储 meter 的查询">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ly798.github.io/2015/12/26/Ceilometer-中-meter-的流程（一）/ceilometer-agent-compute.png">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceilometer 中 meter 的流程（一）">
+<meta name="twitter:description" content="介绍在 ceilometer 中一个 meter 的生命周期可以大概归纳为：  meter 的采集 meter 的存储 meter 的查询">
+<meta name="twitter:image" content="https://ly798.github.io/2015/12/26/Ceilometer-中-meter-的流程（一）/ceilometer-agent-compute.png">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Ceilometer-中-meter-的流程（一）" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Ceilometer 中 meter 的流程（一）
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2015-12-26
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceilometer/">ceilometer</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>在 ceilometer 中一个 meter 的生命周期可以大概归纳为：</p>
+<ol>
+<li>meter 的采集</li>
+<li>meter 的存储</li>
+<li>meter 的查询 <a id="more"></a> </li>
+</ol>
+<p>这一篇写的是 meter 的采集。</p>
+<h2 id="meter的采集"><a href="#meter的采集" class="headerlink" title="meter的采集"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#meter_u7684_u91C7_u96C6" title="meter的采集"></a>meter的采集</h2><p>以 agent_compute 为例，采集 meter 整个流程大概如下：</p>
+<ul>
+<li>ceilometer-agent-compute 服务初始化</li>
+<li>初始化 pollster manager，即系统中实现的采集扩展（extensions）</li>
+<li>初始化 discovery manager，用于获取资源，这里就指的是云主机</li>
+<li>初始化 inspector manager，即 meter 数据的采集器（调用Hypervisor的API），其中实现了具体的数据收集</li>
+<li>获取 pipeline manager，即配置文件 pipeline.yram 中定义的采集项，及其采集周期和数据发送方式</li>
+<li>以 pipelines 和 extensions 的笛卡尔积产生 polling task，并放入线程池</li>
+<li>每一个 task 中，调用 get_samples() 收集到数据，通过 publisher 发送出去</li>
+<li>get_samples() 调用 inspector manager 中对应的采集器获取数据 </li>
+</ul>
+<p>如图：<br><img src="ceilometer-agent-compute.png" alt="ceilometer-agent-compute"></p>
+<h3 id="stevedore"><a href="#stevedore" class="headerlink" title="stevedore"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#stevedore" title="stevedore"></a>stevedore</h3><p>借助 steuptools 的 entry points，可以方便的管理应用程序插件，动态的加载类，三种方式：</p>
+<ol>
+<li>Drivers – Single Name, Single Entry Point</li>
+<li>Hooks – Single Name, Many Entry Points</li>
+<li>Extensions – Many Names, Many Entry Points </li>
+</ol>
+<p>ceilometer 使用了 Extensions 的方式，包括 pollster manager、discovery manager、inspector manager，以<code>pollster manager</code>为例：</p>
+<p>ceilometer/agent.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AgentManager</span><span class="params">(os_service.Service)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self, namespace, default_discovery=None, group_prefix=None)</span>:</span></span><br><span class="line"> self.pollster_manager = self._extensions(<span class="string">‘poll’</span>, namespace)</span><br><span class="line"> …</span><br><span class="line"><span class="decorator"> @staticmethod</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">_extensions</span><span class="params">(category, agent_ns=None)</span>:</span></span><br><span class="line"> namespace = (<span class="string">‘ceilometer.%s.%s’</span> % (category, agent_ns) <span class="keyword">if</span> agent_ns</span><br><span class="line"> <span class="keyword">else</span> <span class="string">‘ceilometer.%s’</span> % category)</span><br><span class="line"> <span class="keyword">return</span> extension.ExtensionManager(</span><br><span class="line"> namespace=namespace,</span><br><span class="line"> invoke_on_load=<span class="keyword">True</span>,</span><br><span class="line"> )</span><br></pre></td></tr></table></figure>
+
+<p>这里的 namespace 是<code>ceilometer.poll.compute</code>，对应到 entry_point 文件中是</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ceilometer<span class="class">.poll</span><span class="class">.compute</span> =</span><br><span class="line"> disk<span class="class">.read</span><span class="class">.requests</span> = ceilometer<span class="class">.compute</span><span class="class">.pollsters</span><span class="class">.disk</span>:ReadRequestsPollster</span><br><span class="line"> disk<span class="class">.write</span><span class="class">.requests</span> = ceilometer<span class="class">.compute</span><span class="class">.pollsters</span><span class="class">.disk</span>:WriteRequestsPollster</span><br><span class="line"> disk<span class="class">.read</span><span class="class">.bytes</span> = ceilometer<span class="class">.compute</span><span class="class">.pollsters</span><span class="class">.disk</span>:ReadBytesPollster</span><br><span class="line"> …</span><br></pre></td></tr></table></figure>
+
+<p>最后返回<code>self.pollster_manager</code>是一个<code>extension.ExtensionManager</code>，其中包含多个采集扩展的实例。</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u6D41_u7A0B" title="流程"></a>流程</h2><h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u542F_u52A8_u670D_u52A1" title="启动服务"></a>启动服务</h3><p>ceilometer/cmd/agent_compute.py 中的<code>main()</code>做最终调用 ceilometer/agent.py 中类 AgentManager 的<code>start()</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">def <span class="operator"><span class="keyword">start</span>(<span class="keyword">self</span>):</span><br><span class="line"> <span class="keyword">self</span>.pipeline_manager = publish_pipeline.setup_pipeline()</span><br><span class="line"></span><br><span class="line"> <span class="keyword">self</span>.partition_coordinator.<span class="keyword">start</span>()</span><br><span class="line"> <span class="keyword">self</span>.join_partitioning_groups()</span><br><span class="line"></span><br><span class="line"> # <span class="keyword">allow</span> <span class="keyword">time</span> <span class="keyword">for</span> coordination <span class="keyword">if</span> necessary</span><br><span class="line"> delay_start = <span class="keyword">self</span>.partition_coordinator.is_active()</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> <span class="built_in">interval</span>, task <span class="keyword">in</span> six.iteritems(<span class="keyword">self</span>.setup_polling_tasks()):</span><br><span class="line"> <span class="keyword">self</span>.tg.add_timer(<span class="built_in">interval</span>,</span><br><span class="line"> <span class="keyword">self</span>.interval_task,</span><br><span class="line"> initial_delay=<span class="built_in">interval</span> <span class="keyword">if</span> delay_start <span class="keyword">else</span> <span class="keyword">None</span>,</span><br><span class="line"> task=task)</span><br><span class="line"> <span class="keyword">self</span>.tg.add_timer(cfg.CONF.coordination.heartbeat,</span><br><span class="line"> <span class="keyword">self</span>.partition_coordinator.heartbeat)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>publish_pipeline.setup_pipeline()，读取配置文件 pipeline.yaml，返回 PipelineManager 实例</li>
+<li>self.setup_polling_tasks()<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">setup_polling_tasks</span><span class="params">(self)</span>:</span></span><br><span class="line"> polling_tasks = &#123;&#125;</span><br><span class="line"> <span class="keyword">for</span> pipeline, pollster <span class="keyword">in</span> itertools.product(</span><br><span class="line"> self.pipeline_manager.pipelines,</span><br><span class="line"> self.pollster_manager.extensions):</span><br><span class="line"> <span class="keyword">if</span> pipeline.support_meter(pollster.name):</span><br><span class="line"> polling_task = polling_tasks.get(pipeline.get_interval())</span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> polling_task:</span><br><span class="line"> polling_task = self.create_polling_task()</span><br><span class="line"> polling_tasks[pipeline.get_interval()] = polling_task</span><br><span class="line"> polling_task.add(pollster, pipeline)</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> polling_tasks</span><br></pre></td></tr></table></figure><br>pipelines 与 pollster 笛卡尔积，判断 pipelines 中是否包括对 pollster 中的 meter 的采集配置，若支持，添加到 polling_task，而 polling_task 在 polling_tasks 以轮询时间为 key 来形成字典，形如 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="rules">&#123;<span class="rule"><span class="attribute">interval</span>:<span class="value">polling_task.<span class="function">add</span>(pollster, pipeline)</span></span></span>&#125;</span><br></pre></td></tr></table></figure>*   遍历 polling_tasks，添加到线程池 </li>
+</ul>
+<h3 id="polling-task"><a href="#polling-task" class="headerlink" title="polling_task"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#polling_task" title="polling_task"></a>polling_task</h3><p>具体的单个 polling_task 的运行<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="decorator">@staticmethod</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">interval_task</span><span class="params">(task)</span>:</span></span><br><span class="line"> task.poll_and_publish()</span><br></pre></td></tr></table></figure> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PollingTask</span><span class="params">(object)</span>:</span></span><br><span class="line"> …</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">poll_and_publish</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="string">“””Polling sample and publish into pipeline.”””</span></span><br><span class="line"> agent_resources = self.manager.discover()</span><br><span class="line"> cache = &#123;&#125;</span><br><span class="line"> discovery_cache = &#123;&#125;</span><br><span class="line"> <span class="keyword">for</span> source, pollster <span class="keyword">in</span> self.pollster_matches:</span><br><span class="line"> pollster_resources = <span class="keyword">None</span></span><br><span class="line"> <span class="keyword">if</span> pollster.obj.default_discovery:</span><br><span class="line"> pollster_resources = self.manager.discover(</span><br><span class="line"> [pollster.obj.default_discovery], discovery_cache)</span><br><span class="line"> key = Resources.key(source, pollster)</span><br><span class="line"> source_resources = list(self.resources[key].get(discovery_cache))</span><br><span class="line"> <span class="keyword">with</span> self.publishers[source.name] <span class="keyword">as</span> publisher:</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> samples = list(pollster.obj.get_samples(</span><br><span class="line"> manager=self.manager,</span><br><span class="line"> cache=cache,</span><br><span class="line"> resources=(source_resources <span class="keyword">or</span></span><br><span class="line"> pollster_resources <span class="keyword">or</span></span><br><span class="line"> agent_resources)</span><br><span class="line"> ))</span><br><span class="line"> publisher(samples)</span><br><span class="line"> …</span><br></pre></td></tr></table></figure> </p>
+<ul>
+<li>关于这里的<code>resources=(source_resources or pollster_resources or agent_resources)</code>，resources 是一个包含了 vm 及其信息的 list，第一次运行的时候等于 agent_resources。</li>
+<li>这里使用提供的 discover（compute_agent 提供的是 local_instances）去匹配 discover manager 中的 discover，返回一个其 discover 实例，即 ceilometer/compute/discover.py:InstanceDiscovery 实例，返回其实例方法 discover() 得到的 vms。值得注意的是 ceilometer/compute/discover.py:InstanceDiscovery<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">discover</span><span class="params">(self, manager, param=None)</span>:</span></span><br><span class="line"> <span class="string">“””Discover resources to monitor.”””</span></span><br><span class="line"> instances = self.nova_cli.instance_get_all_by_host(cfg.CONF.host)</span><br><span class="line"> <span class="keyword">return</span> [i <span class="keyword">for</span> i <span class="keyword">in</span> instances</span><br><span class="line"> <span class="keyword">if</span> getattr(i, <span class="string">‘OS-EXT-STS:vm_state’</span>, <span class="keyword">None</span>) != <span class="string">‘error’</span>]</span><br></pre></td></tr></table></figure> 
+
+</li>
+</ul>
+<p>如果 vm 的 status 是 error 的不返回。</p>
+<h3 id="单个-meter"><a href="#单个-meter" class="headerlink" title="单个 meter"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u5355_u4E2A_meter" title="单个 meter"></a>单个 meter</h3><p>以 cpu 为例，上节的 poll_and_publish() 中的 pollster.obj.get_samples()</p>
+<p>ceilometer/compute/pollster/cpu.py:CPUPollster<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_samples</span><span class="params">(self, manager, cache, resources)</span>:</span></span><br><span class="line"> <span class="keyword">for</span> instance <span class="keyword">in</span> resources:</span><br><span class="line"> LOG.debug(_(<span class="string">‘checking instance %s’</span>), instance.id)</span><br><span class="line"> instance_name = util.instance_name(instance)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> cpu_info = manager.inspector.inspect_cpus(instance_name)</span><br><span class="line"> LOG.debug(_(<span class="string">“CPUTIME USAGE: %(instance)s %(time)d”</span>),</span><br><span class="line"> &#123;<span class="string">‘instance’</span>: instance.<strong>dict</strong>,</span><br><span class="line"> <span class="string">‘time’</span>: cpu_info.time&#125;)</span><br><span class="line"> cpu_num = &#123;<span class="string">‘cpu_number’</span>: cpu_info.number&#125;</span><br><span class="line"> <span class="keyword">yield</span> util.make_sample_from_instance(</span><br><span class="line"> instance,</span><br><span class="line"> name=<span class="string">‘cpu’</span>,</span><br><span class="line"> type=sample.TYPE_CUMULATIVE,</span><br><span class="line"> unit=<span class="string">‘ns’</span>,</span><br><span class="line"> volume=cpu_info.time,</span><br><span class="line"> additional_metadata=cpu_num,</span><br><span class="line"> )</span><br><span class="line"> …</span><br></pre></td></tr></table></figure> </p>
+<ul>
+<li>循环 resources（即 vms），调用 inspector manager 中其对应的 inspector 实例的 inspect_cpus() 获取 cpu 时长，具体实现调用了 libvirt 的 API：<br>ceilometer/compute/virt/libvirt/inspector.py:LibvirtInspector<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inspect_cpus</span><span class="params">(self, instance_name)</span>:</span></span><br><span class="line"> domain = self._lookup_by_name(instance_name)</span><br><span class="line"> dom_info = domain.info()</span><br><span class="line"> <span class="keyword">return</span> virt_inspector.CPUStats(number=dom_info[<span class="number">3</span>], time=dom_info[<span class="number">4</span>])</span><br></pre></td></tr></table></figure>*   得到所有 vms 的 cpu 使用时长数据，使用 publisher(samples) </li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u603B_u7ED3" title="总结"></a>总结</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2015/12/26/Ceilometer-%E4%B8%AD-meter-%E7%9A%84%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%80%EF%BC%89/#u53C2_u8003" title="参考"></a>参考</h2><p>stevedore：<a href="http://docs.openstack.org/developer/stevedore/" target="_blank" rel="noopener">http://docs.openstack.org/developer/stevedore/</a></p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    trove introduction and practice
+  
+</title>
+
+<meta name="description" content="introductionTrove is Database as a Service for OpenStack.">
+<meta name="keywords" content="openstack trove">
+<meta property="og:type" content="article">
+<meta property="og:title" content="trove introduction and practice">
+<meta property="og:url" content="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="introductionTrove is Database as a Service for OpenStack.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="trove introduction and practice">
+<meta name="twitter:description" content="introductionTrove is Database as a Service for OpenStack.">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-trove-introduction-and-practice" class="article article-type-post">
+  
+    <h1 class="article-header">
+      trove introduction and practice
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-12-09
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-trove/">openstack trove</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#introduction" title="introduction"></a>introduction</h2><p>Trove is Database as a Service for OpenStack.<br> <a id="more"></a> </p>
+<h2 id="design"><a href="#design" class="headerlink" title="design"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#design" title="design"></a>design</h2><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+————-+ +———–+ rabbitmq +————-+ </span><br><span class="line">|<span class="string"> troveclient </span>|<span class="string">—–&gt;</span>|<span class="string"> trove-api </span>|<span class="string">———&gt;</span>|<span class="string"> taskmanager </span>|<span class="string"> </span><br><span class="line">+————-+ +———–+ +————-+ </span><br><span class="line"> </span>|<span class="string"> </span><br><span class="line">+———————————–+ </span>|<span class="string"> rabbitmq</span><br><span class="line"></span>|<span class="string"> </span>|<span class="string"> </span>|</span><br><span class="line">|<span class="string"> trove instance +————————-+ +—————–+</span><br><span class="line"></span>|<span class="string"> </span>|<span class="string"> datastore/guest </span>|<span class="string">—–&gt;</span>|<span class="string"> trove-conductor </span>|</span><br><span class="line">|<span class="string"> +————————-+ +—————–+</span><br><span class="line">+———————————–+</span></span><br></pre></td></tr></table></figure> 
+
+<ul>
+<li>trove-api</li>
+<li>trove-taskmanager: 管理数据库实例的生命周期和在数据库实例上的操作。</li>
+<li>trove-guestagent: 运行在数据库实例内，监听 RPC，执行请求操作。</li>
+<li>trove-conductor: guestagent 访问数据库的代理。 </li>
+</ul>
+<p>一个 trove instance 对应一个 vm，trove-guestagent 运行在 vm 内, vm内数据库的数据分区硬盘是 cinder 提供，vm 关联一个 SecurityGroup,允许数据库端口打开。<br>一段源码：</p>
+<pre><code>create_dns_client = import_class(CONF.remote_dns_client) create_guest_client = import_class(CONF.remote_guest_client) create_nova_client = import_class(CONF.remote_nova_client) create_swift_client = import_class(CONF.remote_swift_client) create_cinder_client = import_class(CONF.remote_cinder_client) create_heat_client = import_class(CONF.remote_heat_client) create_neutron_client = import_class(CONF.remote_neutron_client) 
+</code></pre><p>调用了其他的组件来完成，trove 专注与数据库的管理。</p>
+<h2 id="images"><a href="#images" class="headerlink" title="images"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#images" title="images"></a>images</h2><p>image 包含了操作系统、cloud-init 等，另外：</p>
+<ul>
+<li>sql engine (mysql)</li>
+<li>trove-guestagent </li>
+</ul>
+<p>engine 和 trove-guestagent 也可以通过网络动态加载，在 API 中有一个参数是packages 可以指定软件，在 prepare instance 的时候会进行安装。</p>
+<ul>
+<li><p>优点：</p>
+<pre><code>*   灵活，只需要一个镜像，不同的 sql，指定不同的 packages*   缺点：
+
+*   效率，受网络等影响，延长了 instance init 的时间
+</code></pre><ul>
+<li>packages 生成的默认配置文件等可能会被 agent 用到 </li>
+</ul>
+</li>
+</ul>
+<h2 id="feature"><a href="#feature" class="headerlink" title="feature"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#feature" title="feature"></a>feature</h2><p>datastore、database、instance、configuration、backup、replication、cluster 和 数据库中的database、user</p>
+<h3 id="datastore"><a href="#datastore" class="headerlink" title="datastore"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#datastore" title="datastore"></a>datastore</h3><p>理解为数据库系统，对支持的数据库类型及其版本的管理。mysql、postgresql、mongo、redis、cassandra等, 主要针对 mysql 的 5.5 和 5.6。</p>
+<h3 id="database-instance"><a href="#database-instance" class="headerlink" title="database instance"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#database_instance" title="database instance"></a>database instance</h3><p>对数据库实例生命周期的管理，以及 instance 和 volume 的动态 resize。</p>
+<h3 id="configuration"><a href="#configuration" class="headerlink" title="configuration"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#configuration" title="configuration"></a>configuration</h3><p>动态配置更新，针对不同的 datastore有一组预定义的配置，提供给用户来自定义配置，并动态的 attach到数据库实例并生效。</p>
+<h3 id="backup"><a href="#backup" class="headerlink" title="backup"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#backup" title="backup"></a>backup</h3><p>对数据库进行备份。</p>
+<p>针对 mysql 提供全量备份和增量备份。</p>
+<p>mysql 备份的实现：在 guest 使用 mysql 的备份工具 mysqldump 或innobackupex 进行备份，并通过 swift api 上传到对象存储。</p>
+<p>我们 stack 没有使用 openstack swift，测试了 rgw 集成 keystone，使用 rgw的 swift api 来备份，有一个问题：在创建备份的时候，都会为 tenant创建一个名为 <code>database_backups</code> 的 bucket，目前 rgw 的 bucket命名是全局唯一的。</p>
+<h3 id="replication"><a href="#replication" class="headerlink" title="replication"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#replication" title="replication"></a>replication</h3><p>主从结构。</p>
+<p>支持 mysql 的主从数据库创建，实现主从同步复制。</p>
+<h3 id="cluster"><a href="#cluster" class="headerlink" title="cluster"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#cluster" title="cluster"></a>cluster</h3><p>数据库集群。</p>
+<p>juno 版支持 mongo 集群。</p>
+<h3 id="database、user"><a href="#database、user" class="headerlink" title="database、user"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#database_u3001user" title="database、user"></a>database、user</h3><p>API 提供对数据库系统的数据库进行管理，提供对数据库用户的管理。</p>
+<h2 id="example"><a href="#example" class="headerlink" title="example"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#example" title="example"></a>example</h2><h3 id="查询-datastore-及其版本"><a href="#查询-datastore-及其版本" class="headerlink" title="查询 datastore 及其版本"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u67E5_u8BE2_datastore__u53CA_u5176_u7248_u672C" title="查询 datastore 及其版本"></a>查询 datastore 及其版本</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove datastore-list </span></span><br><span class="line">+————————————–|<span class="string">——-+</span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|</span><br><span class="line">+————————————–|<span class="string">——-+</span><br><span class="line"></span>|<span class="string"> f30f5a8c-51b2-4c19-9d13-26bb644dca3e </span>|<span class="string"> mysql </span>|</span><br><span class="line">+————————————–|<span class="string">——-+</span><br><span class="line"># trove datastore-version-list f30f5a8c-51b2-4c19-9d13-26bb644dca3e</span><br><span class="line">+————————————–</span>|<span class="string">——+</span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|</span><br><span class="line">+————————————–|<span class="string">——+</span><br><span class="line"></span>|<span class="string"> 42bce448-ec76-4c80-bea0-128c4eee3471 </span>|<span class="string"> 5.5 </span>|</span><br><span class="line">|<span class="string"> c0581e9a-6597-4ee9-9f34-08362ab3bcc6 </span>|<span class="string"> 5.6 </span>|</span><br><span class="line">+————————————–|<span class="string">——+</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="查询-flavor"><a href="#查询-flavor" class="headerlink" title="查询 flavor"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u67E5_u8BE2_flavor" title="查询 flavor"></a>查询 flavor</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove flavor-list </span></span><br><span class="line">+—-|<span class="string">———–</span>|<span class="string">——-+</span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|<span class="string"> RAM </span>|</span><br><span class="line">+—-|<span class="string">———–</span>|<span class="string">——-+</span><br><span class="line"></span>|<span class="string"> 1 </span>|<span class="string"> m1.tiny </span>|<span class="string"> 512 </span>|</span><br><span class="line">|<span class="string"> 2 </span>|<span class="string"> m1.small </span>|<span class="string"> 2048 </span>|</span><br><span class="line">|<span class="string"> 3 </span>|<span class="string"> m1.medium </span>|<span class="string"> 4096 </span>|</span><br><span class="line">|<span class="string"> 4 </span>|<span class="string"> m1.large </span>|<span class="string"> 8192 </span>|</span><br><span class="line">|<span class="string"> 5 </span>|<span class="string"> m1.xlarge </span>|<span class="string"> 16384 </span>|</span><br><span class="line">|<span class="string"> 6 </span>|<span class="string"> DS-512M </span>|<span class="string"> 512 </span>|</span><br><span class="line">|<span class="string"> 7 </span>|<span class="string"> DS-640M </span>|<span class="string"> 640 </span>|</span><br><span class="line">|<span class="string"> 8 </span>|<span class="string"> DS-384M </span>|<span class="string"> 384 </span>|</span><br><span class="line">|<span class="string"> 9 </span>|<span class="string"> DS-1024M </span>|<span class="string"> 1024 </span>|</span><br><span class="line">+—-|<span class="string">———–</span>|<span class="string">——-+</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="创建-database-instance"><a href="#创建-database-instance" class="headerlink" title="创建 database instance"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u521B_u5EFA_database_instance" title="创建 database instance"></a>创建 database instance</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove create master_1 6 –size=1 –datastore_version 5.5 –datastore mysql </span></span><br><span class="line">+——————-|<span class="string">————————————–+ </span><br><span class="line"></span>|<span class="string"> Property </span>|<span class="string"> Value </span>|<span class="string"> </span><br><span class="line">+——————-</span>|<span class="string">————————————–+ </span><br><span class="line"></span>|<span class="string"> created </span>|<span class="string"> 2016-12-07T03:00:46 </span>|<span class="string"> </span><br><span class="line"></span>|<span class="string"> datastore </span>|<span class="string"> mysql </span>|</span><br><span class="line">|<span class="string"> datastore_version </span>|<span class="string"> 5.5 </span>|<span class="string"> </span><br><span class="line"></span>|<span class="string"> flavor </span>|<span class="string"> 6 </span>|</span><br><span class="line">|<span class="string"> id </span>|<span class="string"> 9788b066-a071-4aa8-bfb3-dd592596b3c6 </span>|</span><br><span class="line">|<span class="string"> name </span>|<span class="string"> master_1 </span>|<span class="string"> </span><br><span class="line"></span>|<span class="string"> status </span>|<span class="string"> BUILD </span>|<span class="string"> </span><br><span class="line"></span>|<span class="string"> updated </span>|<span class="string"> 2016-12-07T03:00:46 </span>|</span><br><span class="line">|<span class="string"> volume </span>|<span class="string"> 1 </span>|</span><br><span class="line">+——————-|<span class="string">————————————–+</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="查看已存在的-configuration-group-并-attach-到-instance"><a href="#查看已存在的-configuration-group-并-attach-到-instance" class="headerlink" title="查看已存在的 configuration group, 并 attach 到 instance"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u67E5_u770B_u5DF2_u5B58_u5728_u7684_configuration_group_2C__u5E76_attach__u5230_instance" title="查看已存在的 configuration group, 并 attach 到 instance"></a>查看已存在的 configuration group, 并 attach 到 instance</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove configuration-list </span></span><br><span class="line">+————————————–|<span class="string">———-</span>|<span class="string">————-</span>|<span class="string">—————-</span>|<span class="string">————————+ </span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|<span class="string"> Description </span>|<span class="string"> Datastore Name </span>|<span class="string"> Datastore Version Name </span>|</span><br><span class="line">+————————————–|<span class="string">———-</span>|<span class="string">————-</span>|<span class="string">—————-</span>|<span class="string">————————+ </span><br><span class="line"></span>|<span class="string"> bd81ea8e-e94d-4d49-a83b-ec78ffc6f15d </span>|<span class="string"> charset </span>|<span class="string"> charset </span>|<span class="string"> mysql </span>|<span class="string"> 5.5 </span>|<span class="string"> </span><br><span class="line">+————————————–</span>|<span class="string">———-</span>|<span class="string">————-</span>|<span class="string">—————-</span>|<span class="string">————————+ </span><br><span class="line"># trove configuration-show bd81ea8e-e94d-4d49-a83b-ec78ffc6f15d </span><br><span class="line">+————————</span>|<span class="string">——————————————————————————————————————————————————————–$———————————————————————————————————————————-+</span><br><span class="line"></span>|<span class="string"> Property </span>|<span class="string"> Value </span>|</span><br><span class="line">+————————|<span class="string">——————————————————————————————————————————————————————–$———————————————————————————————————————————-+</span><br><span class="line"></span>|<span class="string"> created </span>|<span class="string"> 2016-11-25T03:11:28 </span>|</span><br><span class="line">|<span class="string"> datastore_name </span>|<span class="string"> mysql </span>|</span><br><span class="line">|<span class="string"> datastore_version_name </span>|<span class="string"> 5.5 </span>|</span><br><span class="line">|<span class="string"> description </span>|<span class="string"> charset </span>|</span><br><span class="line">|<span class="string"> id </span>|<span class="string"> bd81ea8e-e94d-4d49-a83b-ec78ffc6f15d </span>|</span><br><span class="line">|<span class="string"> instance_count </span>|<span class="string"> 0 </span>|</span><br><span class="line">|<span class="string"> name </span>|<span class="string"> charset </span>|</span><br><span class="line">|<span class="string"> updated </span>|<span class="string"> 2016-11-25T03:11:28 </span>|</span><br><span class="line">|<span class="string"> values </span>|<span class="string"> &#123;”collation_database”: “utf8”, “character_set_connection”: “utf8”, “character_set_client”: “utf8”, “collation_server”: “utf8”, “character_set_database”: “utf8”, “c$llation_connection”: “utf8”, “character_set_results”: “utf8”, “character_set_server”: “utf8”, “character_set_filesystem”: “utf8”&#125; </span>|</span><br><span class="line">+————————|<span class="string">——————————————————————————————————————————————————————–$</span><br><span class="line">———————————————————————————————————————————-+ </span><br><span class="line"># trove configuration-attach 9788b066-a071-4aa8-bfb3-dd592596b3c6 bd81ea8e-e94d-4d49-a83b-ec78ffc6f15d</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="创建一个-database-和-database-user"><a href="#创建一个-database-和-database-user" class="headerlink" title="创建一个 database 和 database user"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u521B_u5EFA_u4E00_u4E2A_database__u548C_database_user" title="创建一个 database 和 database user"></a>创建一个 database 和 database user</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># trove database-create <span class="number">9788</span>b066-a071-<span class="number">4</span>aa8-bfb3-dd592596b3c6 mydb </span></span><br><span class="line"><span class="preprocessor"># trove user-create <span class="number">9788</span>b066-a071-<span class="number">4</span>aa8-bfb3-dd592596b3c6 admin admin –host % –databases mydb</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="创建一个-backup"><a href="#创建一个-backup" class="headerlink" title="创建一个 backup"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u521B_u5EFA_u4E00_u4E2A_backup" title="创建一个 backup"></a>创建一个 backup</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove backup-create 9788b066-a071-4aa8-bfb3-dd592596b3c6 backup.001 </span></span><br><span class="line">+————-|————————————————————————————————-+ </span><br><span class="line">| Property | Value |</span><br><span class="line">+————-|————————————————————————————————-+ </span><br><span class="line">| created | <span class="number">2016</span>-<span class="number">12</span>-<span class="number">07</span>T03:<span class="number">17</span>:<span class="number">22</span> |</span><br><span class="line">| datastore | &#123;<span class="string">u’version’</span>: <span class="string">u’5.5’</span>, <span class="string">u’type’</span>: <span class="string">u’mysql’</span>, <span class="string">u’version_id’</span>: <span class="string">u’42bce448-ec76-4c80-bea0-128c4eee3471’</span>&#125; | </span><br><span class="line">| description | <span class="keyword">None</span> |</span><br><span class="line">| id | <span class="number">538</span>afc35-<span class="number">1112</span>-<span class="number">4</span>d44-bd32-eb1ac39a5f97 |</span><br><span class="line">| instance_id | <span class="number">9788</span>b066-a071-<span class="number">4</span>aa8-bfb3-dd592596b3c6 |</span><br><span class="line">| locationRef | <span class="keyword">None</span> |</span><br><span class="line">| name | backup<span class="number">.001</span> |</span><br><span class="line">| parent_id | <span class="keyword">None</span> |</span><br><span class="line">| size | <span class="keyword">None</span> |</span><br><span class="line">| status | NEW |</span><br><span class="line">| updated | <span class="number">2016</span>-<span class="number">12</span>-<span class="number">07</span>T03:<span class="number">17</span>:<span class="number">22</span> |</span><br><span class="line">+————-|————————————————————————————————-+</span><br></pre></td></tr></table></figure> 
+
+<h3 id="创建一个-replica"><a href="#创建一个-replica" class="headerlink" title="创建一个 replica"></a><a href="https://ly798.github.io/2016/12/09/trove-introduction-and-practice/#u521B_u5EFA_u4E00_u4E2A_replica" title="创建一个 replica"></a>创建一个 replica</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># trove create slave_1 6 –size=1 –datastore_version 5.5 –datastore mysql –replica_of 9788b066-a071-4aa8-bfb3-dd592596b3c6 </span></span><br><span class="line">+——————-|<span class="string">————————————–+ </span><br><span class="line"></span>|<span class="string"> Property </span>|<span class="string"> Value </span>|<span class="string"> </span><br><span class="line">+——————-</span>|<span class="string">————————————–+ </span><br><span class="line"></span>|<span class="string"> created </span>|<span class="string"> 2016-12-07T03:18:50 </span>|</span><br><span class="line">|<span class="string"> datastore </span>|<span class="string"> mysql </span>|</span><br><span class="line">|<span class="string"> datastore_version </span>|<span class="string"> 5.5 </span>|</span><br><span class="line">|<span class="string"> flavor </span>|<span class="string"> 6 </span>|<span class="string"> </span><br><span class="line"></span>|<span class="string"> id </span>|<span class="string"> 819b1d3c-638a-4db2-a193-6066c54b1676 </span>|</span><br><span class="line">|<span class="string"> name </span>|<span class="string"> slave_1 </span>|</span><br><span class="line">|<span class="string"> replica_of </span>|<span class="string"> 9788b066-a071-4aa8-bfb3-dd592596b3c6 </span>|</span><br><span class="line">|<span class="string"> status </span>|<span class="string"> BUILD </span>|</span><br><span class="line">|<span class="string"> updated </span>|<span class="string"> 2016-12-07T03:18:50 </span>|</span><br><span class="line">|<span class="string"> volume </span>|<span class="string"> 1 </span>|</span><br><span class="line">+——————-|<span class="string">————————————–+</span></span><br></pre></td></tr></table></figure>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

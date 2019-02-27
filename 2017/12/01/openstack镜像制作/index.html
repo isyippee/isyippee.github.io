@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    openstack镜像制作
+  
+</title>
+
+<meta name="description" content="introduction整理 openstack 镜像制作过程">
+<meta name="keywords" content="openstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openstack镜像制作">
+<meta property="og:url" content="https://ly798.github.io/2017/12/01/openstack镜像制作/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="introduction整理 openstack 镜像制作过程">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="openstack镜像制作">
+<meta name="twitter:description" content="introduction整理 openstack 镜像制作过程">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-openstack镜像制作" class="article article-type-post">
+  
+    <h1 class="article-header">
+      openstack镜像制作
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2017-12-01
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#introduction" title="introduction"></a>introduction</h2><p>整理 openstack 镜像制作过程<br> <a id="more"></a> </p>
+<h2 id="直接修改官方镜像"><a href="#直接修改官方镜像" class="headerlink" title="直接修改官方镜像"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u76F4_u63A5_u4FEE_u6539_u5B98_u65B9_u955C_u50CF" title="直接修改官方镜像"></a>直接修改官方镜像</h2><p>常用 linux 官方提供 cloud 镜像，可以直接基于其镜像修改，以 ubuntu16.04 为例</p>
+<p>下载 ubuntu16.04 cloud image<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axel -n 2 <a href="https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img" target="_blank" rel="noopener">https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img</a></span><br></pre></td></tr></table></figure> </p>
+<p>使用 guestfish，安装环境<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libguestfs-tools -y</span><br></pre></td></tr></table></figure> </p>
+<p>启动镜像<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export LIBGUESTFS_BACKEND=direct&#10;guestfish –rw -a ./xenial-server-cloudimg-amd64-disk1.img #&#23454;&#38469;&#19978;&#21551;&#21160;&#20102;&#19968; qemu &#34394;&#25311;&#26426;</span><br></pre></td></tr></table></figure> </p>
+<p>进入了 guestfish<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#62;&#60;fs&#62; run&#10;&#62;&#60;fs&#62; list-filesystems&#10;&#62;&#60;fs&#62; mount /dev/sda1 /&#10;&#62;&#60;fs&#62; vi /etc/cloud/cloud.cfg</span><br></pre></td></tr></table></figure> </p>
+<p>接下来修改 cloudinit 来达到新建用户的目的，/etc/cloud/cloud.cfg<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">users:&#10; - default&#10;..&#10;&#10;ssh_pwauth: true&#10;manage_etc_hosts: true&#10;..&#10;cloud_init_modules:&#10;..&#10; - ssh&#10; - bootcmd&#10;&#10;bootcmd:&#10; - addgroup test&#10; - usermod -d /home/test -m -g test -l test ubuntu&#10; - echo &#34;test\ntest&#34; | passwd test</span><br></pre></td></tr></table></figure> </p>
+<p>最后退出，转换格式为 raw 并上传<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#62;&#60;fs&#62; exit&#10;qemu-img convert -O raw xenial-server-cloudimg-amd64-disk1.img xenial-server-cloudimg-amd64-disk1.raw&#10;openstack image create –disk-format raw –container-format bare –public –file ./xenial-server-cloudimg-amd64-disk1.raw xenial-server-cloudimg-amd64-disk1.raw</span><br></pre></td></tr></table></figure> </p>
+<h2 id="手动创建-image"><a href="#手动创建-image" class="headerlink" title="手动创建 image"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u624B_u52A8_u521B_u5EFA_image" title="手动创建 image"></a>手动创建 image</h2><p>TODO</p>
+<h2 id="使用工具制作-image"><a href="#使用工具制作-image" class="headerlink" title="使用工具制作 image"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u4F7F_u7528_u5DE5_u5177_u5236_u4F5C_image" title="使用工具制作 image"></a>使用工具制作 image</h2><p>TODO</p>
+<h2 id="使用-snapshot-制作-image"><a href="#使用-snapshot-制作-image" class="headerlink" title="使用 snapshot 制作 image"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u4F7F_u7528_snapshot__u5236_u4F5C_image" title="使用 snapshot 制作 image"></a>使用 snapshot 制作 image</h2><h3 id="创建一个云主机"><a href="#创建一个云主机" class="headerlink" title="创建一个云主机"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u521B_u5EFA_u4E00_u4E2A_u4E91_u4E3B_u673A" title="创建一个云主机"></a>创建一个云主机</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># nova list&#10;+————————————–|—————-|———|————|————-|—————————————–+&#10;| ID | Name | Status | Task State | Power State | Networks |&#10;+————————————–|—————-|———|————|————-|—————————————–+&#10;| 550db3bb-bd47-4b5b-8a1d-ed465d147618 | centos-tempate | ACTIVE | - | Running | demo-net=10.0.0.24 |&#10;+————————————–|—————-|———|————|————-|—————————————–+</span><br></pre></td></tr></table></figure> 
+
+<h3 id="安装需要的软件"><a href="#安装需要的软件" class="headerlink" title="安装需要的软件"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u5B89_u88C5_u9700_u8981_u7684_u8F6F_u4EF6" title="安装需要的软件"></a>安装需要的软件</h3><p>到云主机安装需要的软件配置等</p>
+<h3 id="清理系统"><a href="#清理系统" class="headerlink" title="清理系统"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u6E05_u7406_u7CFB_u7EDF" title="清理系统"></a>清理系统</h3><p>清理系统不需要文件和空洞<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># rm -f ~/.ssh/id_rsa<em>&#10;# rm -f /home/centos/.ssh/id_rsa</em>&#10;# sudo rm -rf /var/lib/cloud/*&#10;# dd if=/dev/zero of=zerofile # &#33457;&#36153;&#30340;&#26102;&#38388;&#36739;&#38271;&#65292;&#24314;&#35758;&#21019;&#24314;&#34394;&#25311;&#26426;&#30340;&#26102;&#20505;&#30913;&#30424;&#19981;&#35201;&#22826;&#22823;&#10;dd: writing to &#8216;zerofile&#8217;: No space left on device&#10;30952873+0 records in&#10;30952872+0 records out&#10;15847870464 bytes (16 GB) copied, 548.355 s, 28.9 MB/s&#10;# rm zerofile</span><br></pre></td></tr></table></figure> </p>
+<h3 id="关机"><a href="#关机" class="headerlink" title="关机"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u5173_u673A" title="关机"></a>关机</h3><p>关机后保证云主机状态是 shutdown</p>
+<h3 id="创建-share-image"><a href="#创建-share-image" class="headerlink" title="创建 share image"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u521B_u5EFA_share_image" title="创建 share image"></a>创建 share image</h3><p>从云主机的卷创建 image<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># openstack volume set –state available e0d90bde-6f16-4ef5-ad96-40163c1deabe&#10;# openstack image create new-centos-image –volume e0d90bde-6f16-4ef5-ad96-40163c1deabe&#10;# openstack volume set –state in-use e0d90bde-6f16-4ef5-ad96-40163c1deabe</span><br></pre></td></tr></table></figure> </p>
+<h3 id="下载-share-image-并转换"><a href="#下载-share-image-并转换" class="headerlink" title="下载 share image 并转换"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u4E0B_u8F7D_share_image__u5E76_u8F6C_u6362" title="下载 share image 并转换"></a>下载 share image 并转换</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># openstack image save –file new-centos-image.raw a029c88b-3c4b-4ccf-a927-4b6da7c389a6&#10;# openstack image delete a029c88b-3c4b-4ccf-a927-4b6da7c389a6</span><br></pre></td></tr></table></figure> 
+
+<h3 id="删除-tmp-资源"><a href="#删除-tmp-资源" class="headerlink" title="删除 tmp 资源"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u5220_u9664_tmp__u8D44_u6E90" title="删除 tmp 资源"></a>删除 tmp 资源</h3><p>删除云主机、tmp volume、tmp image<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># openstack volume server centos-tempate&#10;# openstack image delete a029c88b-3c4b-4ccf-a927-4b6da7c389a6</span><br></pre></td></tr></table></figure> </p>
+<h3 id="上传-images"><a href="#上传-images" class="headerlink" title="上传 images"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u4E0A_u4F20_images" title="上传 images"></a>上传 images</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># openstack image create \&#10;–disk-format raw \&#10;–container-format bare \&#10;–property skip_atmosphere=yes \&#10;–file new-centos-image.raw \&#10;–public new-centos-image</span><br></pre></td></tr></table></figure> 
+
+<h2 id="制作-windows-image"><a href="#制作-windows-image" class="headerlink" title="制作 windows image"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u5236_u4F5C_windows_image" title="制作 windows image"></a>制作 windows image</h2><h3 id="创建磁盘"><a href="#创建磁盘" class="headerlink" title="创建磁盘"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u521B_u5EFA_u78C1_u76D8" title="创建磁盘"></a>创建磁盘</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f qcow2 win7.qcow2 20G</span><br></pre></td></tr></table></figure> 
+
+<h3 id="启动并安装系统"><a href="#启动并安装系统" class="headerlink" title="启动并安装系统"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u542F_u52A8_u5E76_u5B89_u88C5_u7CFB_u7EDF" title="启动并安装系统"></a>启动并安装系统</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/libexec/qemu-kvm -m 1024 -cdrom win7.iso -drive file=win7.qcow2,if=virtio,boot=on -fda virtio-win_amd64.vfd -boot d -nographic -vnc :3</span><br></pre></td></tr></table></figure> 
+
+<p>使用 vnc 连接进入安装系统界面，安装 virtio 磁盘驱动并安装系统<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vncviewer 127.0.01:5903</span><br></pre></td></tr></table></figure> </p>
+<p>安装完成后关机</p>
+<h3 id="配置系统"><a href="#配置系统" class="headerlink" title="配置系统"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u914D_u7F6E_u7CFB_u7EDF" title="配置系统"></a>配置系统</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/libexec/qemu-kvm -m 1024 -cdrom virtio-win.iso -drive file=win7.qcow2,if=virtio,boot=on -fda virtio-win_amd64.vfd -net nic,model=virtio -net user -boot c -nographic -vnc :3</span><br></pre></td></tr></table></figure> 
+
+<p>使用 vnc 连接进入安装系统</p>
+<ul>
+<li>设备管理器安装 virtio 网络驱动</li>
+<li>系统高级设置打开远程连接</li>
+<li>下载 cloudbase-init 并安装(密码设置插件、磁盘自动分区等功能) </li>
+</ul>
+<p>配置完成后关机</p>
+<h3 id="转换格式"><a href="#转换格式" class="headerlink" title="转换格式"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#u8F6C_u6362_u683C_u5F0F" title="转换格式"></a>转换格式</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img convert -f qcow2 -O raw win7.qcow2 win7.raw</span><br></pre></td></tr></table></figure> 
+
+<h2 id="image-tools"><a href="#image-tools" class="headerlink" title="image tools"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#image_tools" title="image tools"></a>image tools</h2><p>直接操作 image，例如本地挂载</p>
+<p>TODO</p>
+<h2 id="convert-format"><a href="#convert-format" class="headerlink" title="convert format"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#convert_format" title="convert format"></a>convert format</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># qemu-img convert -f raw -O qcow2 image.img image.qcow2</span><br></pre></td></tr></table></figure> 
+
+<h2 id="FAQ"><a href="#FAQ" class="headerlink" title="FAQ"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#FAQ" title="FAQ"></a>FAQ</h2><p>TODO</p>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a><a href="https://ly798.github.io/2017/12/01/openstack%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/#reference" title="reference"></a>reference</h2><ul>
+<li><a href="https://docs.openstack.org/image-guide/" target="_blank" rel="noopener">https://docs.openstack.org/image-guide/</a></li>
+<li><a href="https://iujetstream.atlassian.net/wiki/spaces/JWT/pages/72716305/Creating+snapshots+and+new+Glance+images+from+the+command+line" target="_blank" rel="noopener">https://iujetstream.atlassian.net/wiki/spaces/JWT/pages/72716305/Creating+snapshots+and+new+Glance+images+from+the+command+line</a></li>
+<li><a href="http://khmel.org/?p=1188" target="_blank" rel="noopener">http://khmel.org/?p=1188</a></li>
+<li><a href="http://www.tk4479.net/liukuan73/article/details/47252561" target="_blank" rel="noopener">http://www.tk4479.net/liukuan73/article/details/47252561</a></li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

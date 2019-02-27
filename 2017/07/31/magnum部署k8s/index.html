@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    magnum部署k8s
+  
+</title>
+
+<meta name="description" content="introduction使用 openstack magnum 项目来创建稳定的 k8s 集群。">
+<meta name="keywords" content="openstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="magnum部署k8s">
+<meta property="og:url" content="https://ly798.github.io/2017/07/31/magnum部署k8s/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="introduction使用 openstack magnum 项目来创建稳定的 k8s 集群。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="magnum部署k8s">
+<meta name="twitter:description" content="introduction使用 openstack magnum 项目来创建稳定的 k8s 集群。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-magnum部署k8s" class="article article-type-post">
+  
+    <h1 class="article-header">
+      magnum部署k8s
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2017-07-31
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#introduction" title="introduction"></a>introduction</h2><p>使用 openstack magnum 项目来创建稳定的 k8s 集群。<br> <a id="more"></a> </p>
+<h2 id="版本信息"><a href="#版本信息" class="headerlink" title="版本信息"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u7248_u672C_u4FE1_u606F" title="版本信息"></a>版本信息</h2><table> <thead> <tr> <th>name</th> <th>version</th> </tr> </thead> <tbody> <tr> <td>magnum</td> <td>ocata</td> </tr> <tr> <td>k8s</td> <td>v1.5.3</td> </tr> <tr> <td>kubectl</td> <td>v1.5.3</td> </tr> </tbody> </table> 
+
+<h2 id="部署需要的所有镜像"><a href="#部署需要的所有镜像" class="headerlink" title="部署需要的所有镜像"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u90E8_u7F72_u9700_u8981_u7684_u6240_u6709_u955C_u50CF" title="部署需要的所有镜像"></a>部署需要的所有镜像</h2><ul>
+<li>google_containers/kube-ui:v4</li>
+<li>google_containers/pause-amd64:3.0</li>
+<li>google_containers/hyperkube:v1.5.3</li>
+<li>google_containers/pause:0.8.0</li>
+<li>google_containers/kubedns-amd64:1.9</li>
+<li>google_containers/dnsmasq-metrics-amd64:1.0</li>
+<li>google_containers/kube-dnsmasq-amd64:1.4</li>
+<li>google_containers/exechealthz-amd64:1.2</li>
+<li>google_containers/defaultbackend:1.0</li>
+<li>google_containers/nginx-ingress-controller:0.9.0-beta.11 </li>
+</ul>
+<p>上述所有 docker 镜像打包为 <code>k8s-ocata.tar.gz</code> ，使用 local registry 时将其 push 即可</p>
+<h2 id="环境设置"><a href="#环境设置" class="headerlink" title="环境设置"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u73AF_u5883_u8BBE_u7F6E" title="环境设置"></a>环境设置</h2><p>将 k8s 部署的需要的租户、网络都固定下来，约定如下</p>
+<ul>
+<li>租户: admin</li>
+<li>网络: kycloud-net</li>
+<li>子网: magnum-subnet, 172.16.0.0/24 </li>
+</ul>
+<p>创建并连接路由</p>
+<h2 id="heat-配置"><a href="#heat-配置" class="headerlink" title="heat 配置"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#heat__u914D_u7F6E" title="heat 配置"></a>heat 配置</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># openstack role add –project admin –user admin heat_stack_owner</span><br></pre></td></tr></table></figure> 
+
+<p>上述操作保证 heat stack-create 操作成功</p>
+<h2 id="上传镜像"><a href="#上传镜像" class="headerlink" title="上传镜像"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u4E0A_u4F20_u955C_u50CF" title="上传镜像"></a>上传镜像</h2><p>镜像地址<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><a href="https://fedorapeople.org/groups/magnum/fedora-atomic-ocata.qcow2" target="_blank" rel="noopener">https://fedorapeople.org/groups/magnum/fedora-atomic-ocata.qcow2</a></span><br></pre></td></tr></table></figure> </p>
+<p>转换为 raw 格式<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># qemu-img convert -f qcow2 -O raw fedora-atomic-ocata.qcow2 fedora-atomic-ocata.raw</span><br></pre></td></tr></table></figure> </p>
+<p>上传镜像<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># glance image-create –name fedora-atomic-ocata-raw –disk-format raw –container-format bare –file fedora-atomic-ocata.raw –os-distro fedora-atomic –progress</span><br></pre></td></tr></table></figure> </p>
+<h2 id="创建网络"><a href="#创建网络" class="headerlink" title="创建网络"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u521B_u5EFA_u7F51_u7EDC" title="创建网络"></a>创建网络</h2><p>创建一个独立的网络及其子网用于 k8s 集群</p>
+<h2 id="配置本地-registry"><a href="#配置本地-registry" class="headerlink" title="配置本地 registry"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u914D_u7F6E_u672C_u5730_registry" title="配置本地 registry"></a>配置本地 registry</h2><p>使用 magnum 创建 k8s 需要从 gcr.io 拉取 docker images，可以使用两种办法解决</p>
+<ul>
+<li>配置翻墙</li>
+<li>使用 local registry </li>
+</ul>
+<p>我们采用使用 local registry 的方式实现。</p>
+<h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u90E8_u7F72" title="部署"></a>部署</h3><p>这里使用 k8s 集群的网络创建一个虚拟机，并安装 local registry，具体的步骤是</p>
+<p>安装 docker<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># curl -sSL <a href="https://get.docker.io" target="_blank" rel="noopener">https://get.docker.io</a> | bash&#10;# curl -sSL <a href="https://get.daocloud.io/daotools/set_mirror.sh" target="_blank" rel="noopener">https://get.daocloud.io/daotools/set_mirror.sh</a> | sh -s <a href="http://db9b6d5c.m.daocloud.io" target="_blank" rel="noopener">http://db9b6d5c.m.daocloud.io</a></span><br></pre></td></tr></table></figure> </p>
+<p>部署 local registry<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># docker run -d -p 5000:5000 –restart=always –name registry \&#10; -v <code>pwd</code>/data:/var/lib/registry \&#10; registry:2</span><br></pre></td></tr></table></figure> </p>
+<p>注意需要打开安全组 5000 端口</p>
+<p>将需要的 images 导入到本地<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># docker load -i k8s-ocata.tar.gz</span><br></pre></td></tr></table></figure> </p>
+<p>假设 local registry url 是 192.168.21.10:5000, 给这些镜像打上 tag<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># registry_url=192.168.21.10:5000&#10;# docker tag gcr.io/google_containers/kube-ui:v4 $registry_url/google_containers/kube-ui:v4&#10;# docker tag gcr.io/google_containers/pause-amd64:3.0 $registry_url/google_containers/pause-amd64:3.0&#10;# docker tag gcr.io/google-containers/hyperkube:v1.5.3 $registry_url/google_containers/hyperkube:v1.5.3&#10;# docker tag gcr.io/google_containers/pause:0.8.0 $registry_url/google_containers/pause:0.8.0</span><br></pre></td></tr></table></figure> </p>
+<p>编辑 /etc/docker/daemon.json，配置 registry client(这里的 client 和 registry 都在同个虚拟机中)<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; &#10; &#34;registry-mirrors&#34;: [&#34;<a href="http://db9b6d5c.m.daocloud.io&#34;]" target="_blank" rel="noopener">http://db9b6d5c.m.daocloud.io&#34;]</a>, &#10; &#34;insecure-registries&#34;:[&#34;192.168.21.10:5000&#34;]&#10;&#125;</span><br></pre></td></tr></table></figure> </p>
+<p>重启 docker<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure> </p>
+<p>push 到 registry<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># docker push $registry_url/google_containers/kube-ui:v4&#10;# docker push $registry_url/google_containers/pause-amd64:3.0&#10;# docker push $registry_url/google_containers/hyperkube:v1.5.3&#10;# docker push $registry_url/google_containers/pause:0.8.0</span><br></pre></td></tr></table></figure> </p>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u9A8C_u8BC1" title="验证"></a>验证</h3><p>验证的过程是先删除本地的一个 images，在 pull 一次看是否成功<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># docker rmi $registry_url/google_containers/kube-ui:v4&#10;# docker pull $registry_url/google_containers/kube-ui:v4</span><br></pre></td></tr></table></figure> </p>
+<h2 id="创建-k8s"><a href="#创建-k8s" class="headerlink" title="创建 k8s"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u521B_u5EFA_k8s" title="创建 k8s"></a>创建 k8s</h2><h3 id="template"><a href="#template" class="headerlink" title="template"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#template" title="template"></a>template</h3><p>创建 template<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># magnum cluster-template-create k8s-cluster \&#10;–image fedora-atomic-ocata-raw \&#10;–keypair kolla1 \&#10;–external-network-id cbd41bb4-7e9c-4fb3-bcc8-3c23f7de0587 \&#10;–dns-nameserver 8.8.8.8 \&#10;–master-flavor m1.small \&#10;–flavor m1.large \&#10;–docker-volume-size 40 \&#10;–network-driver flannel \&#10;–coe kubernetes \&#10;–volume-driver cinder \&#10;–floating-ip-enabled \&#10;–fixed-network 4ca571c6-a37c-4035-8746-44c02e9c63bc \&#10;–fixed-subnet 3304e1d2-c3a4-48f3-9691-53072510ec70 \&#10;–insecure-registry 192.168.21.10:5000</span><br></pre></td></tr></table></figure> </p>
+<p>根据实际情况配置参数</p>
+<ul>
+<li>flavor 使用默认的 m1.large</li>
+<li>insecure-registry 配置 local registry</li>
+<li>keypair 用来登录到各个节点作自定义配置</li>
+<li>3 个 net 配置使用 id 的方式，否则使用 loadbalancer 会出错 </li>
+</ul>
+<h3 id="k8s"><a href="#k8s" class="headerlink" title="k8s"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#k8s" title="k8s"></a>k8s</h3><p>创建 k8s<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># magnum cluster-create –node-count 1 –cluster-template k8s-cluster</span><br></pre></td></tr></table></figure> </p>
+<h2 id="配置-k8s-集群"><a href="#配置-k8s-集群" class="headerlink" title="配置 k8s 集群"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u914D_u7F6E_k8s__u96C6_u7FA4" title="配置 k8s 集群"></a>配置 k8s 集群</h2><p>为了能够使用现有 iaas 的 loadbalance 和 cinder as storage 等 feature, 需要对已经创建的 k8s 集群手动作配置改动</p>
+<h3 id="配置节点-hosts"><a href="#配置节点-hosts" class="headerlink" title="配置节点 hosts"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u914D_u7F6E_u8282_u70B9_hosts" title="配置节点 hosts"></a>配置节点 hosts</h3><p>在每个节点配置各个节点的 ip –&gt; hostname，e.g.<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo vi /etc/hosts&#10;172.16.0.55 ph-xmmx4bjtbp-0-asladitc3bww-kube-master-gzhiyy5bnysn&#10;172.16.0.52 ph-rnyzvwp3z5-0-n4ijjqf2cah4-kube-minion-lblxlwli5oj6</span><br></pre></td></tr></table></figure> </p>
+<h3 id="cloud-config"><a href="#cloud-config" class="headerlink" title="cloud-config"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#cloud-config" title="cloud-config"></a>cloud-config</h3><p>配置集群每个节点的 cloud-config， <code>/etc/sysconfig/kube_openstack_config</code> ，将 auth 用户换成 admin 用户<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Global]&#10;auth-url=<a href="http://192.168.21.100:5000/v2.0/" target="_blank" rel="noopener">http://192.168.21.100:5000/v2.0/</a> &#10;username=admin &#10;password=CAk723w8VaEpOpCzSm0SHWg5LK8LI4bEu0sT3o2H &#10;tenant-name=admin &#10;region=RegionOne &#10;trust-id=</span><br></pre></td></tr></table></figure> </p>
+<h3 id="master-节点"><a href="#master-节点" class="headerlink" title="master 节点"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#master__u8282_u70B9" title="master 节点"></a>master 节点</h3><p>k8s 的 controller-manager 使用 docker 启动，之需要修改对应的 manifests 文件 修改 <code>/etc/kubernetes/manifests/kube-controller-manager.yaml</code><br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- controller-manager&#10;- –cloud-provider=openstack&#10;- –cloud-config=/etc/sysconfig/kube_openstack_config</span><br></pre></td></tr></table></figure> </p>
+<p>注意一定要将上述两个参数紧接着放在 <code>controller-manager</code> 之后</p>
+<p>k8s 的 apiserver、kubelet 使用 systemd 管理，作如下修改</p>
+<ul>
+<li>/etc/kubernetes/apiserver</li>
+<li>/etc/kubernetes/kubelet </li>
+</ul>
+<p>在 <code>KUBE_API_ARGS</code> 后添加<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–cloud-provider=openstack –cloud-config=/etc/sysconfig/kube_openstack_config</span><br></pre></td></tr></table></figure> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl restart kube-apiserver.service&#10;$ sudo systemctl restart kubelet.service</span><br></pre></td></tr></table></figure> </p>
+<p>查询服务状态，确保正确<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl status kube-apiserver.service&#10;$ sudo systemctl status kubelet.service</span><br></pre></td></tr></table></figure> </p>
+<h3 id="slave-节点"><a href="#slave-节点" class="headerlink" title="slave 节点"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#slave__u8282_u70B9" title="slave 节点"></a>slave 节点</h3><p>slave 只需要对 kubelet 作修改</p>
+<ul>
+<li>/etc/kubernetes/kubelet <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">–cloud-provider=openstack –cloud-config=/etc/sysconfig/kube_openstack_config</span><br></pre></td></tr></table></figure> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl restart kubelet.service</span><br></pre></td></tr></table></figure> </li>
+</ul>
+<p>查询服务状态，确保正确<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl status kubelet.service</span><br></pre></td></tr></table></figure> </p>
+<h3 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u9A8C_u8BC1-1" title="验证"></a>验证</h3><p>use cinder in k8s <a href="https://docs.openstack.org/magnum/latest/userguide.html#using-cinder-in-kubernetes" target="_blank" rel="noopener">https://docs.openstack.org/magnum/latest/userguide.html#using-cinder-in-kubernetes</a></p>
+<p>use lbaas in k8s <a href="https://github.com/openstack/magnum/blob/master/doc/source/dev/kubernetes-load-balancer.rst" target="_blank" rel="noopener">https://github.com/openstack/magnum/blob/master/doc/source/dev/kubernetes-load-balancer.rst</a></p>
+<h2 id="k8s-dns"><a href="#k8s-dns" class="headerlink" title="k8s-dns"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#k8s-dns" title="k8s-dns"></a>k8s-dns</h2><h3 id="部署-1"><a href="#部署-1" class="headerlink" title="部署"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u90E8_u7F72-1" title="部署"></a>部署</h3><p>需要的 docker 镜像</p>
+<ul>
+<li>gcr.io/google_containers/kubedns-amd64:1.9</li>
+<li>gcr.io/google_containers/dnsmasq-metrics-amd64:1.0</li>
+<li>gcr.io/google_containers/kube-dnsmasq-amd64:1.4</li>
+<li>gcr.io/google_containers/exechealthz-amd64:1.2 </li>
+</ul>
+<p>(参照上面部分的方法将其放到 local registry)</p>
+<p>修改 k8s 集群中节点的 kubelet 启动参数<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi /etc/kubernetes/kubelet&#10;KUBELET_ARGS=&#34;–cluster_dns=10.254.0.10 –cluster_domain=cluster.local&#34;</span><br></pre></td></tr></table></figure> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl restart kubelet</span><br></pre></td></tr></table></figure> </p>
+<p>上传 k8s 的 config 等文件(即 magnum config xx 得到的文件)到集群各个节点<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># scp -r auth/ <a href="mailto:fedora@x.x.x.x" target="_blank" rel="noopener">fedora@x.x.x.x</a>:~/</span><br></pre></td></tr></table></figure> </p>
+<p>另一种方法使用 secret 来存储这些文件并 mount 到 container 内也可实现，需要修改描述文件中相关部分，secret 创建如下<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create secret generic client-auth-files –from-file=config=./config –from-file=ca.pem=./ca.pem –from-file=cert.pem=./cert.pem –from-file=key.pem=./key.pem -n kube-system</span><br></pre></td></tr></table></figure> </p>
+<p>部署 dns，注意配置 skydns-rc.yaml 中的 –kube-master-url=<a href="https://172.16.0.107:6443" target="_blank" rel="noopener">https://172.16.0.107:6443</a><br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create -f skydns-deployment.yaml</span><br></pre></td></tr></table></figure> </p>
+<p>yaml 参考 <a href="https://github.com/ly798/k8s-deploy" target="_blank" rel="noopener">https://github.com/ly798/k8s-deploy</a></p>
+<h3 id="验证-2"><a href="#验证-2" class="headerlink" title="验证"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u9A8C_u8BC1-2" title="验证"></a>验证</h3><p>创建 busybox pod<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create -f busybox.yaml</span><br></pre></td></tr></table></figure> </p>
+<p>使用该 pod 验证<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl exec busybox nslookup kubernetes</span><br></pre></td></tr></table></figure> </p>
+<h2 id="ingress"><a href="#ingress" class="headerlink" title="ingress"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#ingress" title="ingress"></a>ingress</h2><h3 id="部署-2"><a href="#部署-2" class="headerlink" title="部署"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u90E8_u7F72-2" title="部署"></a>部署</h3><p>需要的 docker 镜像</p>
+<ul>
+<li>gcr.io/google_containers/defaultbackend:1.0</li>
+<li>gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.11 </li>
+</ul>
+<p>(参照上面部分的方法将其放到 local registry)</p>
+<p>部署 imgress<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create -f ingress-deployment.yaml</span><br></pre></td></tr></table></figure> </p>
+<p>yaml 参考 <a href="https://github.com/ly798/k8s-deploy" target="_blank" rel="noopener">https://github.com/ly798/k8s-deploy</a></p>
+<p>通过<code>kubectl -n kube-system describe svc ingress-nginx</code>找到 loadbalance，在 openstack 中找到并为其添加一个 floatingip</p>
+<h3 id="验证-3"><a href="#验证-3" class="headerlink" title="验证"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u9A8C_u8BC1-3" title="验证"></a>验证</h3><p>创建一个 nginx 和一个 ingress 进行验证<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create ./nginx-ingress-path/&#10;# kubectl get ing –all-namespaces&#10;NAMESPACE NAME HOSTS ADDRESS PORTS AGE&#10;default nginx-ingress * 192.168.21.236 80 2m&#10;# curl 192.168.21.236/nginx&#10;&#60;html&#62;&#10;&#60;head&#62;&#60;title&#62;301 Moved Permanently&#60;/title&#62;&#60;/head&#62;&#10;&#60;body bgcolor=&#34;white&#34;&#62;&#10;&#60;center&#62;&#60;h1&#62;301 Moved Permanently&#60;/h1&#62;&#60;/center&#62;&#10;&#60;hr&#62;&#60;center&#62;nginx/1.13.3&#60;/center&#62;&#10;&#60;/body&#62;&#10;&#60;/html&#62;</span><br></pre></td></tr></table></figure> </p>
+<h2 id="k8s-dashboard"><a href="#k8s-dashboard" class="headerlink" title="k8s-dashboard"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#k8s-dashboard" title="k8s-dashboard"></a>k8s-dashboard</h2><h3 id="部署-3"><a href="#部署-3" class="headerlink" title="部署"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u90E8_u7F72-3" title="部署"></a>部署</h3><p>需要的 docker 镜像</p>
+<ul>
+<li>gcr.io/google_containers/kubernetes-dashboard-amd64:v1.5.1 </li>
+</ul>
+<p>(注意版本对应，参照上面部分的方法将其放到 local registry)</p>
+<p>部署 imgress<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl create -f kube-dashboard-deployment.yaml</span><br></pre></td></tr></table></figure> </p>
+<p>yaml 参考 <a href="https://github.com/ly798/k8s-deploy" target="_blank" rel="noopener">https://github.com/ly798/k8s-deploy</a></p>
+<h3 id="验证-4"><a href="#验证-4" class="headerlink" title="验证"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u9A8C_u8BC1-4" title="验证"></a>验证</h3><p>使用 proxy 实现访问<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># kubectl proxy</span><br></pre></td></tr></table></figure> </p>
+<p>然后是使用浏览器访问 <a href="http://127.0.0.1:8001/ui" target="_blank" rel="noopener">http://127.0.0.1:8001/ui</a> 即可</p>
+<p>还可以使用 ingress 的方式来实现访问，但有安全问题，ingress 如下<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: extensions/v1beta1&#10;kind: Ingress&#10;metadata:&#10; name: kubernetes-dashboard-ingress&#10; namespace: kube-system&#10;spec:&#10; rules:&#10; - host: ui.myk8s.com&#10; http:&#10; paths:&#10; - backend:&#10; serviceName: kubernetes-dashboard&#10; servicePort: 80</span><br></pre></td></tr></table></figure> </p>
+<p>访问 <a href="http://ui.myk8s.com" target="_blank" rel="noopener">http://ui.myk8s.com</a> 即可</p>
+<h2 id="FAQ"><a href="#FAQ" class="headerlink" title="FAQ"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#FAQ" title="FAQ"></a>FAQ</h2><h3 id="正常集群的-docker-images-和服务"><a href="#正常集群的-docker-images-和服务" class="headerlink" title="正常集群的 docker images 和服务"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u6B63_u5E38_u96C6_u7FA4_u7684_docker_images__u548C_u670D_u52A1" title="正常集群的 docker images 和服务"></a>正常集群的 docker images 和服务</h3><p>master node:<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[fedora@k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz ~]$ sudo docker images&#10;REPOSITORY TAG IMAGE ID CREATED SIZE&#10;gcr.io/google_containers/hyperkube v1.5.3 08fdc4720263 5 months ago 557.5 MB&#10;gcr.io/google_containers/pause-amd64 3.0 99e59f495ffa 14 months ago 746.9 kB&#10;[fedora@k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz ~]$ sudo docker ps&#10;CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES&#10;9cd5a7a5b52c gcr.io/google_containers/hyperkube:v1.5.3 &#34;/hyperkube controlle&#34; 4 minutes ago Up 4 minutes k8s_kube-controller-manager.d1de1666_kube-controller-manager-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_94d16460f7db6bd63dd617ff8527deb6_fc4d74ee&#10;3c7e9189f60c gcr.io/google_containers/hyperkube:v1.5.3 &#34;/hyperkube scheduler&#34; 4 minutes ago Up 4 minutes k8s_kube-scheduler.a3560f4b_kube-scheduler-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_cd57cab0d68c7d6b68604c1873b9fd23_fedadfaf&#10;9e7f59b94ecf gcr.io/google_containers/hyperkube:v1.5.3 &#34;/hyperkube proxy –m&#34; 4 minutes ago Up 4 minutes k8s_kube-proxy.adc74569_kube-proxy-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_00bbe3f517c93071991098603d8809d7_e05e71a0&#10;f03216cf985b gcr.io/google_containers/pause-amd64:3.0 &#34;/pause&#34; 6 minutes ago Up 6 minutes k8s_POD.d8dbe16c_kube-controller-manager-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_94d16460f7db6bd63dd617ff8527deb6_c3f76b6b&#10;420045f9d8c7 gcr.io/google_containers/pause-amd64:3.0 &#34;/pause&#34; 7 minutes ago Up 6 minutes k8s_POD.d8dbe16c_kube-scheduler-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_cd57cab0d68c7d6b68604c1873b9fd23_d9333644&#10;825df619192b gcr.io/google_containers/pause-amd64:3.0 &#34;/pause&#34; 7 minutes ago Up 7 minutes k8s_POD.d8dbe16c_kube-proxy-k2-tgqfxoqymo-0-2lgmxw53emmp-kube-master-tfqau4357qaz_kube-system_00bbe3f517c93071991098603d8809d7_be91ac8e</span><br></pre></td></tr></table></figure> </p>
+<p>miniom node:<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[fedora@k2-qbjizye63f-0-dopyfnyolgvh-kube-minion-ib42uvm3myve ~]$ sudo docker images&#10;REPOSITORY TAG IMAGE ID CREATED SIZE&#10;gcr.io/google_containers/hyperkube v1.5.3 08fdc4720263 5 months ago 557.5 MB&#10;gcr.io/google_containers/pause-amd64 3.0 99e59f495ffa 14 months ago 746.9 kB&#10;gcr.io/google_containers/kube-ui v4 762cc97d5aa1 19 months ago 5.677 MB&#10;[fedora@k2-qbjizye63f-0-dopyfnyolgvh-kube-minion-ib42uvm3myve ~]$ sudo docker ps&#10;CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES&#10;1c5b7b9a90fd gcr.io/google_containers/kube-ui:v4 &#34;/kube-ui&#34; 2 minutes ago Up 2 minutes k8s_kube-ui.53edfc94_kube-ui-v4-8vczr_kube-system_de2938a2-7104-11e7-8a3f-fa163e74b5a1_25809512&#10;49328e69c8b3 gcr.io/google_containers/hyperkube:v1.5.3 &#34;/hyperkube proxy –m&#34; 3 minutes ago Up 2 minutes k8s_kube-proxy.e8846ca1_kube-proxy-k2-qbjizye63f-0-dopyfnyolgvh-kube-minion-ib42uvm3myve_kube-system_dc6c88a4f0d6b3341f1b942f3dbf8885_dd7f1dc1&#10;c00f5c8e8bd7 gcr.io/google_containers/pause-amd64:3.0 &#34;/pause&#34; 4 minutes ago Up 3 minutes k8s_POD.1e570369_kube-ui-v4-8vczr_kube-system_de2938a2-7104-11e7-8a3f-fa163e74b5a1_518ad58d&#10;6cc5cfda187f gcr.io/google_containers/pause-amd64:3.0 &#34;/pause&#34; 5 minutes ago Up 4 minutes k8s_POD.d8dbe16c_kube-proxy-k2-qbjizye63f-0-dopyfnyolgvh-kube-minion-ib42uvm3myve_kube-system_dc6c88a4f0d6b3341f1b942f3dbf8885_0f31b601</span><br></pre></td></tr></table></figure> </p>
+<h3 id="k8s-集群的扩展"><a href="#k8s-集群的扩展" class="headerlink" title="k8s 集群的扩展"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#k8s__u96C6_u7FA4_u7684_u6269_u5C55" title="k8s 集群的扩展"></a>k8s 集群的扩展</h3><ol>
+<li>直接使用 magnum update 方式扩展节点个数</li>
+<li><p>节点 docker pool 的扩展</p>
+<p>可直接给对应 node 添加 cinder 卷，对 docker-pool 使用 lvm 进行扩展 </p>
+</li>
+</ol>
+<h3 id="k8s-集群节点重启"><a href="#k8s-集群节点重启" class="headerlink" title="k8s 集群节点重启"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#k8s__u96C6_u7FA4_u8282_u70B9_u91CD_u542F" title="k8s 集群节点重启"></a>k8s 集群节点重启</h3><p>重启后到各节点上启动 docker 实例<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo docker start <code>sudo docker ps -a -q</code></span><br></pre></td></tr></table></figure> </p>
+<h3 id="使用-LoadBalancer-时报错"><a href="#使用-LoadBalancer-时报错" class="headerlink" title="使用 LoadBalancer 时报错"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#u4F7F_u7528_LoadBalancer__u65F6_u62A5_u9519" title="使用 LoadBalancer 时报错"></a>使用 LoadBalancer 时报错</h3><p>在 master 节点报错<br> <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Aug 09 07:16:56 ph-xmmx4bjtbp-0-asladitc3bww-kube-master-gzhiyy5bnysn.novalocal dockerd-current[2295]: I0809 07:16:56.799446 1 event.go:217] Event(api.ObjectReference&#123;Kind:&#34;ReplicaSet&#34;, Namespace:&#34;default&#34;, Name:&#34;nginx-deployment-1045676374&#34;, UID:&#34;ba01e2a2-7cd2-11e7-82c2-fa163ed8eebc&#34;, APIVersion:&#34;extensions&#34;, ResourceVersion:&#34;1484&#34;, FieldPath:&#34;&#34;&#125;): type: &#39;Normal&#39; reason: &#39;SuccessfulCreate&#39; Created pod: nginx-deployment-1045676374-618mn&#10;Aug 09 07:16:56 ph-xmmx4bjtbp-0-asladitc3bww-kube-master-gzhiyy5bnysn.novalocal dockerd-current[2295]: E0809 07:16:56.932792 1 servicecontroller.go:760] Failed to process service. Retrying in 5s: Failed to create load balancer for service default/nginxservice-loadbalancer: Error creating loadbalancer ab9e95e8d7cd211e782c2fa163ed8eeb: Error creating loadbalancer &#123;ab9e95e8d7cd211e782c2fa163ed8eeb Kubernetes external service ab9e95e8d7cd211e782c2fa163ed8eeb magnum-subnet &#60;nil&#62; &#125;: Expected HTTP response code [201 202] when accessing [POST <a href="http://192.168.21.100:9696/v2.0/lbaas/loadbalancers]" target="_blank" rel="noopener">http://192.168.21.100:9696/v2.0/lbaas/loadbalancers]</a>, but got 400 instead&#10;Aug 09 07:16:56 ph-xmmx4bjtbp-0-asladitc3bww-kube-master-gzhiyy5bnysn.novalocal dockerd-current[2295]: &#123;&#34;NeutronError&#34;: &#123;&#34;message&#34;: &#34;Invalid input for vip_subnet_id. Reason: &#39;magnum-subnet&#39; is not a valid UUID.&#34;, &#34;type&#34;: &#34;HTTPBadRequest&#34;, &#34;detail&#34;: &#34;&#34;&#125;&#125;</span><br></pre></td></tr></table></figure> </p>
+<p>template 中的 net 相关配置不能使用 name，要使用 uuid</p>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a><a href="https://ly798.github.io/2017/07/31/magnum%E9%83%A8%E7%BD%B2k8s/#reference" title="reference"></a>reference</h2><ul>
+<li><a href="https://docs.openstack.org/magnum/latest/" target="_blank" rel="noopener">https://docs.openstack.org/magnum/latest/</a></li>
+<li><a href="https://mritd.me/2017/03/04/how-to-use-nginx-ingress/" target="_blank" rel="noopener">https://mritd.me/2017/03/04/how-to-use-nginx-ingress/</a></li>
+<li><a href="https://github.com/kubernetes/dashboard/blob/v1.5.1/src/deploy/kubernetes-dashboard.yaml" target="_blank" rel="noopener">https://github.com/kubernetes/dashboard/blob/v1.5.1/src/deploy/kubernetes-dashboard.yaml</a></li>
+<li><a href="https://github.com/kubernetes/dashboard/blob/master/docs/user-guide/troubleshooting.md" target="_blank" rel="noopener">https://github.com/kubernetes/dashboard/blob/master/docs/user-guide/troubleshooting.md</a></li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

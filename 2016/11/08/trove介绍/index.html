@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    trove介绍
+  
+</title>
+
+<meta name="description" content="介绍H版成为核心项目。">
+<meta name="keywords" content="openstack trove">
+<meta property="og:type" content="article">
+<meta property="og:title" content="trove介绍">
+<meta property="og:url" content="https://ly798.github.io/2016/11/08/trove介绍/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍H版成为核心项目。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="trove介绍">
+<meta name="twitter:description" content="介绍H版成为核心项目。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-trove介绍" class="article article-type-post">
+  
+    <h1 class="article-header">
+      trove介绍
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-11-08
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-trove/">openstack trove</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>H版成为核心项目。<br> <a id="more"></a> </p>
+<p>nova - 实例<br>cinder - 数据盘<br>neutron - net<br>glance - image</p>
+<p>该实例中运行database和trove-guestagent，连接rabbitmq获取操作命令。</p>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#u57FA_u672C_u7528_u6CD5" title="基本用法"></a>基本用法</h2><h3 id="datastore"><a href="#datastore" class="headerlink" title="datastore"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#datastore" title="datastore"></a>datastore</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//create a datastore </span><br><span class="line">//trove-manage datastore_update <span class="variable">&lt;datastore_name&gt;</span> <span class="variable">&lt;default_version&gt;</span> </span><br><span class="line"><span class="comment"># trove-manage datastore_update mysql “” </span></span><br><span class="line"></span><br><span class="line">//add a version to the datastore </span><br><span class="line">//trove-manage datastore_version_update <span class="variable">&lt;datastore_name&gt;</span> <span class="variable">&lt;version_name&gt;</span> <span class="variable">&lt;datastore_manager&gt;</span> <span class="variable">&lt;glance_id&gt;</span> <span class="variable">&lt;packages&gt;</span> <span class="variable">&lt;active:0/1&gt;</span> </span><br><span class="line"><span class="comment"># trove-manage datastore_version_update mysql 5.6 mysql 333ba4b1-638e-4fac-b516-28dad691e319 “” 1 </span></span><br><span class="line"></span><br><span class="line"><span class="comment"># trove datastore-list </span></span><br><span class="line">+————————————–|<span class="string">————+</span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|</span><br><span class="line">+————————————–|<span class="string">————+</span><br><span class="line"></span>|<span class="string"> f30f5a8c-51b2-4c19-9d13-26bb644dca3e </span>|<span class="string"> mysql </span>|</span><br><span class="line">+————————————–|<span class="string">————+</span><br><span class="line"></span><br><span class="line"># trove datastore-version-list mysql </span><br><span class="line">+————————————–</span>|<span class="string">—————–+</span><br><span class="line"></span>|<span class="string"> ID </span>|<span class="string"> Name </span>|</span><br><span class="line">+————————————–|<span class="string">—————–+</span><br><span class="line"></span>|<span class="string"> 645d6577-e140-450f-b01f-c07314e17131 </span>|<span class="string"> 5.6 </span>|</span><br><span class="line">+————————————–|<span class="string">—————–+</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="instance-database、user"><a href="#instance-database、user" class="headerlink" title="instance(database、user)"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#instance_28database_u3001user_29" title="instance(database、user)"></a>instance(database、user)</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># trove datastore-list </span></span><br><span class="line"><span class="preprocessor"># trove datastore-version-list mysql</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove create mariadb1 <span class="number">6</span> –size <span class="number">2</span> –datastore mysql –datastore_version <span class="number">5.6</span> –users admin:admin –databases init_db –configuration &lt;&gt; </span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove user-create d5f2a516-<span class="number">0472</span>-<span class="number">4e8</span>f-<span class="number">9682</span>-f77f691b13a8 admin admin </span></span><br><span class="line"><span class="preprocessor"># trove user-list d5f2a516-<span class="number">0472</span>-<span class="number">4e8</span>f-<span class="number">9682</span>-f77f691b13a </span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove database-create d5f2a516-<span class="number">0472</span>-<span class="number">4e8</span>f-<span class="number">9682</span>-f77f691b13a8 initdb </span></span><br><span class="line"><span class="preprocessor"># trove database-list d5f2a516-<span class="number">0472</span>-<span class="number">4e8</span>f-<span class="number">9682</span>-f77f691b13a8 </span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove resize-volume d5f2a516-<span class="number">0472</span>-<span class="number">4e8</span>f-<span class="number">9682</span>-f77f691b13a8 <span class="number">2</span></span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="backup-restore"><a href="#backup-restore" class="headerlink" title="backup/restore"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#backup/restore" title="backup/restore"></a>backup/restore</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># trove backup-create 019e0efb-8c27-428f-ad98-2cb801a42af2 backup.0001</span><br></pre></td></tr></table></figure> 
+
+<h3 id="relication"><a href="#relication" class="headerlink" title="relication"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#relication" title="relication"></a>relication</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># trove create replica_1 9 –size=1 –datastore_version centos-mariadb –datastore mysql –replica_of b9697ca9-ecc4-4216-a3d7-37f7a7a8f2c8</span><br></pre></td></tr></table></figure> 
+
+<h3 id="configuration"><a href="#configuration" class="headerlink" title="configuration"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#configuration" title="configuration"></a>configuration</h3><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># trove-manage db_load_datastore_config_parameters mysql mysql-5.6 /usr/lib/python2.7/site-packages/trove/templates/mysql/validation-rules.json </span></span><br><span class="line"><span class="preprocessor"># trove configuration-parameter-list mysql-5.6 –datastore mysql </span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove configuration-create test ‘&#123;”max_connections”:80&#125;’ –datastore mysql –datastore_version mysql-5.6 </span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># trove configuration-attach 15a0c217-4a2b-4d64-9522-d8ef08016a39 9d345196-247d-473d-acdc-cb0825fb3d64</span></span><br></pre></td></tr></table></figure> 
+
+<h2 id="各版本"><a href="#各版本" class="headerlink" title="各版本"></a><a href="https://ly798.github.io/2016/11/08/trove-%E4%BB%8B%E7%BB%8D/#u5404_u7248_u672C" title="各版本"></a>各版本</h2><ul>
+<li><p>juno</p>
+<pre><code>*   MySQL, PostgreSQL
+</code></pre><ul>
+<li>Apache Cassandra, MongoDB, Couchbase and Redis</li>
+<li>MYSQL replication</li>
+<li>MongoDB cluster </li>
+</ul>
+</li>
+<li><p>liberty</p>
+<pre><code>*   redis cluster*   mitaka
+
+*   mariadb cluster*   trove logging
+</code></pre></li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

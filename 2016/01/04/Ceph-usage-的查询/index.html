@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Ceph usage 的查询
+  
+</title>
+
+<meta name="description" content="介绍usage 用于统计用户的使用情况，操作记录。">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph usage 的查询">
+<meta property="og:url" content="https://ly798.github.io/2016/01/04/Ceph-usage-的查询/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍usage 用于统计用户的使用情况，操作记录。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph usage 的查询">
+<meta name="twitter:description" content="介绍usage 用于统计用户的使用情况，操作记录。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Ceph-usage-的查询" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Ceph usage 的查询
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-01-04
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/01/04/Ceph-usage-%E7%9A%84%E6%9F%A5%E8%AF%A2/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>usage 用于统计用户的使用情况，操作记录。<br> <a id="more"></a> </p>
+<h2 id="admin-commands"><a href="#admin-commands" class="headerlink" title="admin commands"></a><a href="https://ly798.github.io/2016/01/04/Ceph-usage-%E7%9A%84%E6%9F%A5%E8%AF%A2/#admin_commands" title="admin commands"></a>admin commands</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">radosgw-admin usage show [–uid=&#123;uid&#125;] [–start-date=&#123;date&#125;] [–end-date=&#123;date&#125;] [–categories=&lt;list&gt;] [–show-log-entries=&lt;flag&gt;] [–show-log-sum=&lt;flag&gt;]</span><br></pre></td></tr></table></figure> 
+
+<p>example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">radosgw-admin usage show –uid=demo –start-date=<span class="string">“2015-12-01 08:00:00”</span> –end-date=<span class="string">“2015-12-02 08:00:00”</span> –categories=<span class="string">“put_obj,put_acls”</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>–start-date、–categories 中含需转义字符，使用” “即可。</li>
+<li>–show-log-entries=true/false 即usage详细条目，–show-log-sum=true/false 即usage概览</li>
+<li>关于 –categories，有如下：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">radosgw-admin usage show | grep category | awk -F <span class="string">‘“‘</span> <span class="string">‘&#123;print $4&#125;’</span> | sort | uniq</span><br><span class="line">abort_multipart</span><br><span class="line">complete_multipart</span><br><span class="line">copy_obj</span><br><span class="line">create_bucket</span><br><span class="line">delete_bucket</span><br><span class="line">delete_obj</span><br><span class="line">get_acls</span><br><span class="line">get_bucket_logging</span><br><span class="line">get_cors</span><br><span class="line">get_obj</span><br><span class="line">init_multipart</span><br><span class="line">list_bucket</span><br><span class="line">list_bucket_multiparts</span><br><span class="line">list_buckets</span><br><span class="line">list_multipart</span><br><span class="line">multi_object_delete</span><br><span class="line">options_cors</span><br><span class="line">post_obj</span><br><span class="line">put_acls</span><br><span class="line">put_obj</span><br><span class="line"><span class="built_in">stat</span>_bucket</span><br></pre></td></tr></table></figure> </li>
+</ul>
+<h2 id="admin-restapi"><a href="#admin-restapi" class="headerlink" title="admin restapi"></a><a href="https://ly798.github.io/2016/01/04/Ceph-usage-%E7%9A%84%E6%9F%A5%E8%AF%A2/#admin_restapi" title="admin restapi"></a>admin restapi</h2><p>请求</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="request">GET <span class="string">/admin/usage</span> HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span>: <span class="string">host</span></span><br><span class="line"><span class="attribute">date</span>: <span class="string">Date</span></span><br><span class="line"><span class="attribute">Authorization</span>: <span class="string">auth</span></span><br></pre></td></tr></table></figure>
+
+<p>请求参数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uid,<span class="operator"><span class="keyword">start</span>,<span class="keyword">end</span>,<span class="keyword">show</span>-entries,<span class="keyword">show</span>-summary</span></span><br></pre></td></tr></table></figure>
+
+<p>example</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">relativePath=<span class="string">“/admin/usage”</span></span><br><span class="line">start=<span class="string">“2015-12-20%2020%3A00%3A00”</span> <span class="comment"># : 和空格转义</span></span><br><span class="line">curl <span class="operator">-s</span> -v -X GET <span class="string">“http://<span class="variable">$&#123;HOST&#125;</span><span class="variable">$&#123;relativePath&#125;</span>?start=<span class="variable">$&#123;start&#125;</span>&amp;show-entries=true&amp;show-summary=false”</span> \</span><br><span class="line">-H <span class="string">“Authorization: AWS <span class="variable">$&#123;KEY_ID&#125;</span>:<span class="variable">$&#123;signature&#125;</span>“</span> \</span><br><span class="line">-H <span class="string">“Date: <span class="variable">$&#123;DATE&#125;</span>“</span> \</span><br><span class="line">-H <span class="string">“Host: <span class="variable">$&#123;HOST&#125;</span>“</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="code"><a href="#code" class="headerlink" title="code"></a><a href="https://ly798.github.io/2016/01/04/Ceph-usage-%E7%9A%84%E6%9F%A5%E8%AF%A2/#code" title="code"></a>code</h2><ol>
+<li>rgw_admin.cc:main()<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (ceph_argparse_witharg(args, i, &amp;val, <span class="string">“–date”</span>, <span class="string">“–time”</span>, (<span class="keyword">char</span><em>)<span class="literal">NULL</span>)) &#123;</em></span><br><span class="line"> date = val;</span><br><span class="line"> <span class="keyword">if</span> (end_date.empty())</span><br><span class="line"> end_date = date;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (ceph_argparse_witharg(args, i, &amp;val, <span class="string">“–start-date”</span>, <span class="string">“–start-time”</span>, (<span class="keyword">char</span>)<span class="literal">NULL</span>)) &#123;</span><br><span class="line"> start_date = val;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (ceph_argparse_witharg(args, i, &amp;val, <span class="string">“–end-date”</span>, <span class="string">“–end-time”</span>, (<span class="keyword">char</span><em>)<span class="literal">NULL</span>)) &#123;</em></span><br><span class="line"> end_date = val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+       可以用 –date 或 –time 来指定 end_date<br><em>   –</em>-date 也可以用 –<em>-time 来指定2.  utime_t::parse_date()<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> </span></pre></td></tr></table></figure></em>p = strptime(date.c_str(), <span class="string">“%Y-%m-%d”</span>, &amp;tm);<br><br>    <em>   strptime() 函数成功返回 </em>buff 的最后位置，失败返回空指针。<br><em>   当 date 是 “%Y-%m-%d %H:%M:%S” 时，</em>p 为字符 “ “，先转换 %Y-%m-%d，当 <em>p== “ “，说明还有 %H:%M:%S
+</em>   date 可以是 “%Y-%m-%d” 或者 “%Y-%m-%d %H:%M:%S”3.  rgw_log.cc:125<br>存储一个usage时调用的方法<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">insert</span><span class="params">(utime_t&amp; timestamp, rgw_usage_log_entry&amp; entry)</span> </span>&#123;</span><br><span class="line"> lock.Lock();</span><br><span class="line"> <span class="keyword">if</span> (timestamp.sec() &gt; round_timestamp + <span class="number">3600</span>)</span><br><span class="line"> recalc_round_timestamp(timestamp);</span><br><span class="line"> entry.epoch = round_timestamp.sec();</span><br><span class="line"> <span class="keyword">bool</span> account;</span><br><span class="line"> <span class="function">rgw_user_bucket <span class="title">ub</span><span class="params">(entry.owner, entry.bucket)</span></span>;</span><br><span class="line"> usage_map[ub].insert(round_timestamp, entry, &amp;account);</span><br><span class="line"> <span class="keyword">if</span> (account)</span><br><span class="line"> num_entries++;</span><br><span class="line"> <span class="keyword">bool</span> need_flush = (num_entries &gt; cct-&gt;_conf-&gt;rgw_usage_log_flush_threshold);</span><br><span class="line"> lock.Unlock();</span><br><span class="line"> <span class="keyword">if</span> (need_flush) &#123;</span><br><span class="line"> Mutex::<span class="function">Locker <span class="title">l</span><span class="params">(timer_lock)</span></span>;</span><br><span class="line"> flush();</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure> 
+
+</li>
+</ol>
+<p>对应的recalc_round_timestamp()</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">recalc_round_timestamp</span><span class="params">(utime_t&amp; ts)</span> </span>&#123;</span><br><span class="line"> round_timestamp = ts.round_to_hour();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终的 usage_map[ub].insert(round_timestamp, entry, &amp;account); 中的 round_timestamp 是以小时为单位。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><a href="https://ly798.github.io/2016/01/04/Ceph-usage-%E7%9A%84%E6%9F%A5%E8%AF%A2/#u603B_u7ED3" title="总结"></a>总结</h2><p>usage 的查询可以时间可以指定到时分秒，但事实上 usage 的存储是以小时为单位的，也就是说可以精确到小时。<br>time 的 start、end 遵循左闭右开的规则。<br>该时间是 UTC 时间。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

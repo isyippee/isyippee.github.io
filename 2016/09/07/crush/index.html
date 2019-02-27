@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    crush
+  
+</title>
+
+<meta name="description" content="介绍在看ceph的时候，crush这部分算是刚接触ceph时最让人迷惑的地方吧。 在分布式存储中的数据分布问题：">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="crush">
+<meta property="og:url" content="https://ly798.github.io/2016/09/07/crush/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍在看ceph的时候，crush这部分算是刚接触ceph时最让人迷惑的地方吧。 在分布式存储中的数据分布问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/ring.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/add_node.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/reduce_node.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/vnode.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/vnode_add_node.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/obj_osd.png">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/map.jpg">
+<meta property="og:image" content="https://ly798.github.io/2016/09/07/crush/bucket_types.png">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.882Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="crush">
+<meta name="twitter:description" content="介绍在看ceph的时候，crush这部分算是刚接触ceph时最让人迷惑的地方吧。 在分布式存储中的数据分布问题：">
+<meta name="twitter:image" content="https://ly798.github.io/2016/09/07/crush/ring.png">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-crush" class="article article-type-post">
+  
+    <h1 class="article-header">
+      crush
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-09-07
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/09/07/crush/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>在看ceph的时候，crush这部分算是刚接触ceph时最让人迷惑的地方吧。</p>
+<p>在分布式存储中的数据分布问题：<br> <a id="more"></a></p>
+<ul>
+<li>为了负载均衡，数据需要均匀的进行分布</li>
+<li>数据分布是动态的，要能够便于存储介质的添加删除</li>
+</ul>
+<p>ceph使用了CRUSH，swift使用了consistent hashing，CRUSH类似consistent hashing，与之最大的区别在于接受的参数多了cluster map和placement rules，更加详细的考虑到了机架等存储层次。</p>
+<h2 id="consistent-hashing"><a href="#consistent-hashing" class="headerlink" title="consistent hashing"></a><a href="https://ly798.github.io/2016/09/07/crush/#consistent_hashing" title="consistent hashing"></a>consistent hashing</h2><h3 id="普通hash"><a href="#普通hash" class="headerlink" title="普通hash"></a><a href="https://ly798.github.io/2016/09/07/crush/#u666E_u901Ahash" title="普通hash"></a>普通hash</h3><p>N个节点、假设一个均匀的hash函数hash()，计算数据对象key的分布：</p>
+<p><code>n = hash(key) mod N</code></p>
+<p>但是当node增加或减少的时候，所有的数据对象都需要重新计算分布，大量的数据移动。</p>
+<h3 id="consistent-hashing-1"><a href="#consistent-hashing-1" class="headerlink" title="consistent hashing"></a><a href="https://ly798.github.io/2016/09/07/crush/#consistent_hashing-1" title="consistent hashing"></a>consistent hashing</h3><h4 id="普通consistent-hashing"><a href="#普通consistent-hashing" class="headerlink" title="普通consistent hashing"></a><a href="https://ly798.github.io/2016/09/07/crush/#u666E_u901Aconsistent_hashing" title="普通consistent hashing"></a>普通consistent hashing</h4><ul>
+<li>构造值为 0 - 2^32 的ring</li>
+<li>计算node的hash，定位到ring</li>
+<li>计算数据对象的hash，定位到ring</li>
+<li>针对一个数据对象，顺时针查找第一个node即为所属node </li>
+</ul>
+<p><img src="ring.png" alt="ring"></p>
+<p>在node较少的时候，增加或减少节点，有较大的数据移动，负载不均匀。</p>
+<p><img src="add_node.png" alt="add_node"><br><img src="reduce_node.png" alt="reduce_node"></p>
+<h4 id="分布式consistent-hashing"><a href="#分布式consistent-hashing" class="headerlink" title="分布式consistent hashing"></a><a href="https://ly798.github.io/2016/09/07/crush/#u5206_u5E03_u5F0Fconsistent_hashing" title="分布式consistent hashing"></a>分布式consistent hashing</h4><p>引入虚拟节点，其数量在部署的时候预估且不能改变。</p>
+<p><img src="vnode.png" alt="vnode"></p>
+<p>当node增加或减少的时候，数据对象 –&gt; vnode 的映射不会改变，只有 vnode –&gt; node 映射改变，少量数据移动。</p>
+<p><img src="vnode_add_node.png" alt="vnode_add_node"></p>
+<h2 id="CRUSH"><a href="#CRUSH" class="headerlink" title="CRUSH"></a><a href="https://ly798.github.io/2016/09/07/crush/#CRUSH" title="CRUSH"></a>CRUSH</h2><p>Controlled Replication Under Scalable Hashing</p>
+<p><img src="obj_osd.png" alt="obj_osd"></p>
+<p>计算pgid：</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hash(<span class="keyword">object</span> <span class="type">ID</span>) <span class="keyword">mod</span> <span class="type">PGs</span> –&gt; <span class="number">58</span></span><br><span class="line">pool <span class="type">ID</span> –&gt; <span class="number">4</span></span><br><span class="line">pgid –&gt; <span class="number">4.58</span></span><br></pre></td></tr></table></figure>
+
+<p>pg映射osd：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">CRUSH</span><span class="params">(x)</span></span> ­‐&gt; (osd n1, osd n2,osd n2)</span><br></pre></td></tr></table></figure>
+
+<p>参数</p>
+<ul>
+<li>x pgid</li>
+<li>cluster map</li>
+<li>placement rule </li>
+</ul>
+<p>输出一组osd</p>
+<h3 id="cluster-map"><a href="#cluster-map" class="headerlink" title="cluster map"></a><a href="https://ly798.github.io/2016/09/07/crush/#cluster_map" title="cluster map"></a>cluster map</h3><p>描述存储设备的逻辑分布。在cluster map中有2个概念，</p>
+<ul>
+<li>bucket 父节点，如机架、host，可以用于隔离故障域；</li>
+<li>device 叶子节点，硬盘。 </li>
+</ul>
+<p>各自的权重与容量、吞吐量有关系。 </p>
+<p><img src="map.jpg" alt="map"></p>
+<p>不同的bucket type，有不同的选择算法，计算复杂度和osd删除添加的数据移动是不一样的。 </p>
+<p><img src="bucket_types.png" alt="bucket_types"></p>
+<ul>
+<li>uniform<br>所有的item权重都是相同的，不考虑权重</li>
+<li>list<br>添加设备的时候，有最优的数据移动，适用集群拓展类型</li>
+<li>tree</li>
+<li>straw<br>考虑权重，有最优的数据移动 </li>
+</ul>
+<h3 id="placement-rule"><a href="#placement-rule" class="headerlink" title="placement rule"></a><a href="https://ly798.github.io/2016/09/07/crush/#placement_rule" title="placement rule"></a>placement rule</h3><p>the replica placement policy，放置策略，描述了选择设备的过程</p>
+<p>eg</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">rule replicated_ruleset &#123;</span><br><span class="line"> ruleset <span class="number">0</span> <span class="preprocessor"># 编号</span></span><br><span class="line"> <span class="built_in">type</span> replicated <span class="preprocessor"># replicated/esurecode</span></span><br><span class="line"> min_size <span class="number">1</span> <span class="preprocessor"># 最小副本数</span></span><br><span class="line"> max_size <span class="number">10</span> <span class="preprocessor"># 最大副本数</span></span><br><span class="line"> <span class="built_in">step</span> take <span class="keyword">default</span></span><br><span class="line"> <span class="built_in">step</span> chooseleaf firstn <span class="number">0</span> <span class="built_in">type</span> host</span><br><span class="line"> <span class="built_in">step</span> emit</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="map-example"><a href="#map-example" class="headerlink" title="map example"></a><a href="https://ly798.github.io/2016/09/07/crush/#map_example" title="map example"></a>map example</h3><p>获取集群的crush map信息<br> <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd getcrushmap -o crush.<span class="built_in">map</span> <span class="preprocessor"># 获取map，已编译</span></span><br><span class="line">crushtool -d crush.<span class="built_in">map</span> &gt;&gt; crush.txt <span class="preprocessor"># 反编译</span></span><br></pre></td></tr></table></figure> </p>
+<p>cursh.txt 的内容<br> <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># begin crush map</span></span><br><span class="line">tunable choose_local_tries <span class="number">0</span></span><br><span class="line">tunable choose_local_fallback_tries <span class="number">0</span></span><br><span class="line">tunable choose_total_tries <span class="number">50</span></span><br><span class="line">tunable chooseleaf_descend_once <span class="number">1</span></span><br><span class="line">tunable straw_calc_version <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># devices</span></span><br><span class="line">device <span class="number">0</span> osd<span class="number">.0</span></span><br><span class="line">device <span class="number">1</span> osd<span class="number">.1</span></span><br><span class="line">device <span class="number">2</span> osd<span class="number">.2</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># types</span></span><br><span class="line">type <span class="number">0</span> osd</span><br><span class="line">type <span class="number">1</span> host</span><br><span class="line">type <span class="number">2</span> chassis</span><br><span class="line">type <span class="number">3</span> rack</span><br><span class="line">type <span class="number">4</span> row</span><br><span class="line">type <span class="number">5</span> pdu</span><br><span class="line">type <span class="number">6</span> pod</span><br><span class="line">type <span class="number">7</span> room</span><br><span class="line">type <span class="number">8</span> datacenter</span><br><span class="line">type <span class="number">9</span> region</span><br><span class="line">type <span class="number">10</span> root</span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># buckets</span></span><br><span class="line">host ceph1 &#123;</span><br><span class="line"> id -<span class="number">2</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.093</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item osd<span class="number">.0</span> weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line">host ceph2 &#123;</span><br><span class="line"> id -<span class="number">3</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.093</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item osd<span class="number">.1</span> weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line">host ceph3 &#123;</span><br><span class="line"> id -<span class="number">4</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.093</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item osd<span class="number">.2</span> weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line">root <span class="keyword">default</span> &#123;</span><br><span class="line"> id -<span class="number">1</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.279</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item ceph1 weight <span class="number">0.093</span></span><br><span class="line"> item ceph2 weight <span class="number">0.093</span></span><br><span class="line"> item ceph3 weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># rules</span></span><br><span class="line">rule replicated_ruleset &#123;</span><br><span class="line"> ruleset <span class="number">0</span></span><br><span class="line"> type replicated</span><br><span class="line"> min_size <span class="number">1</span></span><br><span class="line"> max_size <span class="number">10</span></span><br><span class="line"> step take <span class="keyword">default</span></span><br><span class="line"> step chooseleaf firstn <span class="number">0</span> type host</span><br><span class="line"> step emit</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># end crush map</span></span><br></pre></td></tr></table></figure> </p>
+<h4 id="pool实现ssd作为primary"><a href="#pool实现ssd作为primary" class="headerlink" title="pool实现ssd作为primary"></a><a href="https://ly798.github.io/2016/09/07/crush/#pool_u5B9E_u73B0ssd_u4F5C_u4E3Aprimary" title="pool实现ssd作为primary"></a>pool实现ssd作为primary</h4><p>新添加的一个rule规则：<br> <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">host ceph1-ssd &#123;</span><br><span class="line"> id -<span class="number">5</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.093</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item osd<span class="number">.3</span> weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line">root ssd &#123;</span><br><span class="line"> id -<span class="number">6</span> <span class="preprocessor"># do not change unnecessarily</span></span><br><span class="line"> <span class="preprocessor"># weight <span class="number">0.093</span></span></span><br><span class="line"> alg straw</span><br><span class="line"> hash <span class="number">0</span> <span class="preprocessor"># rjenkins1</span></span><br><span class="line"> item ceph1-ssd weight <span class="number">0.093</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">rule ssd_primary &#123;</span><br><span class="line"> ruleset <span class="number">1</span></span><br><span class="line"> type replicated</span><br><span class="line"> min_size <span class="number">1</span></span><br><span class="line"> max_size <span class="number">10</span></span><br><span class="line"> step take ssd</span><br><span class="line"> step chooseleaf firstn <span class="number">1</span> type host</span><br><span class="line"> step emit</span><br><span class="line"> step take <span class="keyword">default</span></span><br><span class="line"> step chooseleaf firstn -<span class="number">1</span> type host</span><br><span class="line"> step emit</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> </p>
+<p>创建一个rule 是 ssd_primary的pool，并上传一个对象<br> <figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ceph osd crush rule ls</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ceph osd pool create test-ssd 8 8 replicated ssd_primary</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rados -p test-ssd put aaa aaa</span></span><br><span class="line"><span class="comment"># ceph osd map test-ssd aaa</span></span><br><span class="line">osdmap e836 pool <span class="string">‘test-ssd’</span> <span class="function"><span class="params">(<span class="number">132</span>)</span> <span class="title">object</span> ‘<span class="title">aaa</span>‘ -&gt;</span> pg <span class="number">132.c</span>6f58be5 <span class="function"><span class="params">(<span class="number">132.5</span>)</span> -&gt;</span> up ([<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>], p3) acting ([<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>], p3)</span><br></pre></td></tr></table></figure> </p>
+<p>可以看出该pg的primary osd 是3，即新定义的ssd osd</p>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a><a href="https://ly798.github.io/2016/09/07/crush/#u6E90_u7801" title="源码"></a>源码</h3><p>调试选择的过程<br> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph osd getmap -o osdmap</span><br><span class="line">ceph osd lspools</span><br><span class="line">gdb –args /home/ceph/src/osdmaptool –test-map-<span class="tag">object</span> aaa –pool <span class="number">132</span> osdmap</span><br><span class="line"><span class="tag">b</span> crush_do_rule</span><br></pre></td></tr></table></figure> <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">crush_do_rule</span><span class="params">(<span class="keyword">const</span> <span class="keyword">struct</span> crush_map <em><span class="built_in">map</span>,</em></span><br><span class="line"> <span class="keyword">int</span> ruleno, <span class="keyword">int</span> x, <span class="keyword">int</span> result, <span class="keyword">int</span> result_max,</span><br><span class="line"> <span class="keyword">const</span> __u32 <em>weight, <span class="keyword">int</span> weight_max,</em></span><br><span class="line"> <span class="keyword">int</span> scratch)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">…</span><br><span class="line"> <span class="keyword">for</span> (step = <span class="number">0</span>; step &lt; rule-&gt;len; step++) &#123;</span><br><span class="line"> <span class="keyword">case</span> CRUSH_RULE_TAKE:</span><br><span class="line"> …</span><br></pre></td></tr></table></figure> <table> <thead> <tr> <th style="text-align:left"><em>category</em></th> <th style="text-align:left"><em>name</em></th> </tr> </thead> <tbody> <tr> <td style="text-align:left">Start</td> <td style="text-align:left">CRUSH_RULE_TAKE(1)</td> </tr> <tr> <td style="text-align:left">End</td> <td style="text-align:left">CRUSH_RULE_EMIT(4)</td> </tr> <tr> <td style="text-align:left">ChooseBucket</td> <td style="text-align:left">CRUSH_RULE_CHOOSE_FIRSTN(2)</td> </tr> <tr> <td style="text-align:left">ChooseBucket</td> <td style="text-align:left">CRUSH_RULE_CHOOSE_INDEP(3)</td> </tr> <tr> <td style="text-align:left">ChooseDevice</td> <td style="text-align:left">CRUSH_RULE_CHOOSELEAF_FIRSTN(6)</td> </tr> <tr> <td style="text-align:left">ChooseDevice</td> <td style="text-align:left">CRUSH_RULE_CHOOSELEAF_INDEP(7)</td> </tr> <tr> <td style="text-align:left">SetVariable</td> <td style="text-align:left">CRUSH_RULE_SET_CHOOSE_TRIES(8)</td> </tr> <tr> <td style="text-align:left">SetVariable</td> <td style="text-align:left">CRUSH_RULE_SET_CHOOSELEAF_TRIES(9)</td> </tr> <tr> <td style="text-align:left">SetVariable</td> <td style="text-align:left">CRUSH_RULE_SET_CHOOSE_LOCAL_TRIES(10)</td> </tr> <tr> <td style="text-align:left">SetVariable</td> <td style="text-align:left">CRUSH_RULE_SET_CHOOSE_LOCAL_FALLBACK_TRIES(11)</td> </tr> <tr> <td style="text-align:left">SetVariable</td> <td style="text-align:left">CRUSH_RULE_SET_CHOOSELEAF_VARY_R(12)</td> </tr> </tbody> </table> </p>
+<p>在参数map 中crush_map</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> crush_rule &#123;</span><br><span class="line"> <strong>u32 len;</strong></span><br><span class="line"> <span class="keyword">struct</span> crush_rule_mask mask;</span><br><span class="line"> <span class="keyword">struct</span> crush_rule_step steps[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br> <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> crush_rule_step &#123;</span><br><span class="line"> u32 op;</span><br><span class="line"> <strong>s32 arg1;</strong></span><br><span class="line"> s32 arg2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure> 
+
+<p>选择过程</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">step</span> <span class="keyword">take</span> ssd</span><br><span class="line"><span class="keyword">step</span> chooseleaf firstn <span class="number">1</span> <span class="keyword">type</span> host <span class="comment">// pools size 3; 0&lt;1&lt;3 ; select 1</span></span><br><span class="line"><span class="keyword">step</span> emit</span><br><span class="line"><span class="keyword">step</span> <span class="keyword">take</span> <span class="keyword">default</span></span><br><span class="line"><span class="keyword">step</span> chooseleaf firstn -<span class="number">1</span> <span class="keyword">type</span> host <span class="comment">// -1&lt;0 ; select 3-1</span></span><br><span class="line"><span class="keyword">step</span> emit</span><br></pre></td></tr></table></figure>
+
+<p>对应的crush_rule_step依次是</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$19</span> = &#123;op = <span class="number">1</span>, arg1 = -<span class="number">6</span>, arg2 = <span class="number">0</span>&#125; // -<span class="number">6</span> ssd id</span><br><span class="line"><span class="variable">$20</span> = &#123;op = <span class="number">6</span>, arg1 = <span class="number">1</span>, arg2 = <span class="number">1</span>&#125; // <span class="number">1</span></span><br><span class="line"><span class="variable">$21</span> = &#123;op = <span class="number">4</span>, arg1 = <span class="number">0</span>, arg2 = <span class="number">0</span>&#125; //</span><br><span class="line"><span class="variable">$22</span> = &#123;op = <span class="number">1</span>, arg1 = -<span class="number">1</span>, arg2 = <span class="number">0</span>&#125; // -<span class="number">1</span> <span class="keyword">default</span> id</span><br><span class="line"><span class="variable">$23</span> = &#123;op = <span class="number">6</span>, arg1 = -<span class="number">1</span>, arg2 = <span class="number">1</span>&#125; // -<span class="number">1</span></span><br><span class="line"><span class="variable">$24</span> = &#123;op = <span class="number">4</span>, arg1 = <span class="number">0</span>, arg2 = <span class="number">0</span>&#125; //</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2016/09/07/crush/#u53C2_u8003" title="参考"></a>参考</h2><ul>
+<li><a href="http://my.huhoo.net/archives/2010/06/post_55.html" target="_blank" rel="noopener">http://my.huhoo.net/archives/2010/06/post_55.html</a></li>
+<li><a href="http://ceph.com/papers/weil-crush-sc06.pdf" target="_blank" rel="noopener">http://ceph.com/papers/weil-crush-sc06.pdf</a></li>
+<li><a href="http://way4ever.com/?p=123" target="_blank" rel="noopener">http://way4ever.com/?p=123</a></li>
+<li><a href="http://my.oschina.net/linuxhunter/blog/639016" target="_blank" rel="noopener">http://my.oschina.net/linuxhunter/blog/639016</a></li>
+<li><a href="https://www.mirantis.com/blog/object-storage-openstack-cloud-swift-ceph/" target="_blank" rel="noopener">https://www.mirantis.com/blog/object-storage-openstack-cloud-swift-ceph/</a><!-- markdown-toc end --></li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

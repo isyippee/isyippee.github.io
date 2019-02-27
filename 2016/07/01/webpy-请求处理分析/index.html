@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    webpy 请求处理分析
+  
+</title>
+
+<meta name="description" content="介绍通过一个todolist的例子来分析请求处理的大概的流程。">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpy 请求处理分析">
+<meta property="og:url" content="https://ly798.github.io/2016/07/01/webpy-请求处理分析/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍通过一个todolist的例子来分析请求处理的大概的流程。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpy 请求处理分析">
+<meta name="twitter:description" content="介绍通过一个todolist的例子来分析请求处理的大概的流程。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-webpy-请求处理分析" class="article article-type-post">
+  
+    <h1 class="article-header">
+      webpy 请求处理分析
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-07-01
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/07/01/webpy-%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E5%88%86%E6%9E%90/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>通过一个todolist的例子来分析请求处理的大概的流程。<br> <a id="more"></a> </p>
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a><a href="https://ly798.github.io/2016/07/01/webpy-%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E5%88%86%E6%9E%90/#u8FC7_u7A0B" title="过程"></a>过程</h2><p>从<code>app.run()</code>服务开始运行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">application</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self, <em>middleware)</em></span>:</span></span><br><span class="line"> <span class="keyword">return</span> wsgi.runwsgi(self.wsgifunc(middleware))</span><br><span class="line"></span><br><span class="line"><span class="comment">#这里的传递fun是wsgi中的app</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">runwsgi</span><span class="params">(func)</span>:</span></span><br><span class="line"> <span class="comment">#判断fcgi、scgi、simple server，使用simple server</span></span><br><span class="line"> httpserver.runsimple(func, server_addr)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">runsimple</span><span class="params">(func, server_address=<span class="params">(<span class="string">“0.0.0.0”</span>, <span class="number">8080</span>)</span>)</span>:</span></span><br><span class="line"> server = WSGIServer(server_address, func)</span><br><span class="line"> server.start()</span><br><span class="line"></span><br><span class="line"><span class="comment">#这个WSGIServer是一个方法，不是类</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">WSGIServer</span><span class="params">(server_address, wsgi_app)</span>:</span></span><br><span class="line"> <span class="keyword">import</span> wsgiserver</span><br><span class="line"> server = wsgiserver.CherryPyWSGIServer(server_address, wsgi_app, server_name=<span class="string">“localhost”</span>)</span><br><span class="line"> <span class="keyword">return</span> server</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CherryPyWSGIServer</span><span class="params">(HTTPServer)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self, bind_addr, wsgi_app, numthreads=<span class="number">10</span>, server_name=None,</span><br><span class="line"> max=-<span class="number">1</span>, request_queue_size=<span class="number">5</span>, timeout=<span class="number">10</span>, shutdown_timeout=<span class="number">5</span>)</span>:</span></span><br><span class="line"> <span class="comment">#初始化线程池</span></span><br><span class="line"> self.requests = ThreadPool(self, min=numthreads <span class="keyword">or</span> <span class="number">1</span>, max=max)</span><br><span class="line"> self.wsgi_app = wsgi_app</span><br><span class="line"> <span class="comment">#用于调用wsgi处理请求并回写给客户端</span></span><br><span class="line"> self.gateway = wsgi_gateways[self.wsgi_version]</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HTTPServer</span><span class="params">(object)</span>:</span></span><br><span class="line"> <span class="comment">#start实在runsimple方法中调用了</span></span><br><span class="line"> <span class="comment">#获取socket信息，绑定监听地址和端口</span></span><br><span class="line"> <span class="comment">#启动self.requests线程</span></span><br><span class="line"> <span class="comment">#获取来自可断断的请求</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line"> self.requests.start()</span><br><span class="line"> self.ready = <span class="keyword">True</span></span><br><span class="line"> <span class="keyword">while</span> self.ready:</span><br><span class="line"> self.tick()</span><br><span class="line"> </span><br><span class="line"> <span class="comment">#接受客户端的请求，封装为ConnectionClass，放到线程池的队列中</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">tick</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="string">“””Accept a new connection and put it on the Queue.”””</span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> s, addr = self.socket.accept()</span><br><span class="line"> …</span><br><span class="line"> conn = self.ConnectionClass(self, s, makefile)</span><br><span class="line"> self.requests.put(conn)</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ThreadPool</span><span class="params">(object)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self, server, min=<span class="number">10</span>, max=-<span class="number">1</span>)</span>:</span></span><br><span class="line"> self.server = server</span><br><span class="line"> self.min = min</span><br><span class="line"> self.max = max</span><br><span class="line"> self._threads = []</span><br><span class="line"> self._queue = Queue.Queue()</span><br><span class="line"> self.get = self._queue.get</span><br><span class="line"> </span><br><span class="line"> <span class="comment">#创建固定数量的线程，并启动</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="string">“””Start the pool of threads.”””</span></span><br><span class="line"> <span class="keyword">for</span> i <span class="keyword">in</span> range(self.min):</span><br><span class="line"> self._threads.append(WorkerThread(self.server))</span><br><span class="line"> <span class="keyword">for</span> worker <span class="keyword">in</span> self._threads:</span><br><span class="line"> worker.setName(<span class="string">“CP Server “</span> + worker.getName())</span><br><span class="line"> worker.start()</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, obj)</span>:</span></span><br><span class="line"> self._queue.put(obj)</span><br><span class="line"> <span class="keyword">if</span> obj <span class="keyword">is</span> _SHUTDOWNREQUEST:</span><br><span class="line"> <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkerThread</span><span class="params">(threading.Thread)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"> conn = self.server.requests.get() <span class="comment">#self.get = self._queue.get</span></span><br><span class="line"> conn.communicate()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HTTPConnection</span><span class="params">(object)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">communicate</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line"> <span class="comment">#验证</span></span><br><span class="line"> req = self.RequestHandlerClass(self.server, self)</span><br><span class="line"> req.parse_request()</span><br><span class="line"> req.respond()</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HTTPRequest</span><span class="params">(object)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">respond</span><span class="params">(self)</span>:</span></span><br><span class="line"> self.server.gateway(self).respond()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIGateway_10</span><span class="params">(WSGIGateway)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self, req)</span>:</span></span><br><span class="line"> self.req = req</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">respond</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="comment"># 这里的wsgi_app就是CherryPyWSGIServer的<strong>init</strong>中传递的wsgi_app</span></span><br><span class="line"> response = self.req.server.wsgi_app(self.env, self.start_response)</span><br><span class="line"> <span class="keyword">for</span> chunk <span class="keyword">in</span> response:</span><br><span class="line"> <span class="keyword">if</span> chunk:</span><br><span class="line"> <span class="keyword">if</span> isinstance(chunk, unicode):</span><br><span class="line"> chunk = chunk.encode(<span class="string">‘ISO-8859-1’</span>)</span><br><span class="line"> self.write(chunk)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">application</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">wsgifunc</span><span class="params">(self, *middleware)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">wsgi</span><span class="params">(env, start_resp)</span>:</span></span><br><span class="line"> self.load(env)</span><br><span class="line"> result = web.safestr(iter(result))</span><br><span class="line"> start_resp(status, headers)</span><br><span class="line"> <span class="keyword">return</span> itertools.chain(result, cleanup())</span><br><span class="line"> <span class="keyword">return</span> wsgi</span><br></pre></td></tr></table></figure>
+
+<p>一一对应WSGI中的角色，豁然开朗。</p>
+<p>大概总结wsgi规则:<br>application要是一个可调用的对象，接受两个参数，返回一个可迭代的值<br>server调用application，传递给application两个参数，迭代application的返回值，传递给client</p>
+<p>下面具体看application的实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">application</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self, mapping=<span class="params">()</span>, fvars=&#123;&#125;, autoreload=None)</span>:</span></span><br><span class="line"> <span class="keyword">if</span> autoreload <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line"> autoreload = web.config.get(<span class="string">‘debug’</span>, <span class="keyword">False</span>)</span><br><span class="line"> self.init_mapping(mapping)</span><br><span class="line"> self.fvars = fvars</span><br><span class="line"> self.processors = []</span><br><span class="line"> self.add_processor(loadhook(self._load))</span><br><span class="line"> self.add_processor(unloadhook(self._unload))</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">wsgifunc</span><span class="params">(self, *middleware)</span>:</span></span><br><span class="line"> <span class="string">“””Returns a WSGI-compatible function for this application.”””</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">wsgi</span><span class="params">(env, start_resp)</span>:</span></span><br><span class="line"> <span class="comment"># clear threadlocal to avoid inteference of previous requests</span></span><br><span class="line"> self._cleanup()</span><br><span class="line"> self.load(env)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="comment"># allow uppercase methods only</span></span><br><span class="line"> <span class="keyword">if</span> web.ctx.method.upper() != web.ctx.method:</span><br><span class="line"> <span class="keyword">raise</span> web.nomethod()</span><br><span class="line"> result = self.handle_with_processors()</span><br><span class="line"> <span class="keyword">if</span> is_generator(result):</span><br><span class="line"> result = peep(result)</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> result = [result]</span><br><span class="line"> <span class="keyword">except</span> web.HTTPError, e:</span><br><span class="line"> result = [e.data]</span><br><span class="line"> result = web.safestr(iter(result))</span><br><span class="line"> status, headers = web.ctx.status, web.ctx.headers</span><br><span class="line"> start_resp(status, headers)</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">cleanup</span><span class="params">()</span>:</span></span><br><span class="line"> self._cleanup()</span><br><span class="line"> <span class="keyword">yield</span> <span class="string">‘’</span> <span class="comment"># force this function to be a generator</span></span><br><span class="line"> <span class="keyword">return</span> itertools.chain(result, cleanup())</span><br><span class="line"> <span class="keyword">for</span> m <span class="keyword">in</span> middleware: </span><br><span class="line"> wsgi = m(wsgi)</span><br><span class="line"> <span class="keyword">return</span> wsgi</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">init_mapping</span><span class="params">(self, mapping)</span>:</span></span><br><span class="line"> self.mapping = list(utils.group(mapping, <span class="number">2</span>))</span><br><span class="line"> <span class="comment">#将元组转换为类似[[‘/‘, ‘Index’], [‘/del/(\d+)’, ‘Delete’]]</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment"># 执行self.handle()</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">handle_with_processors</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="comment"># return self.processors<a href="self.processors[1](self.handle(">0</a>))</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">process</span><span class="params">(processors)</span>:</span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="keyword">if</span> processors:</span><br><span class="line"> p, processors = processors[<span class="number">0</span>], processors[<span class="number">1</span>:]</span><br><span class="line"> <span class="keyword">return</span> p(<span class="keyword">lambda</span>: process(processors))</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> <span class="keyword">return</span> self.handle()</span><br><span class="line"> <span class="keyword">except</span> web.HTTPError:</span><br><span class="line"> <span class="keyword">raise</span></span><br><span class="line"> <span class="keyword">except</span> (KeyboardInterrupt, SystemExit):</span><br><span class="line"> <span class="keyword">raise</span></span><br><span class="line"> <span class="keyword">except</span>:</span><br><span class="line"> <span class="keyword">print</span> &gt;&gt; web.debug, traceback.format_exc()</span><br><span class="line"> <span class="keyword">raise</span> self.internalerror()</span><br><span class="line"> </span><br><span class="line"> <span class="comment"># processors must be applied in the resvere order. (??)</span></span><br><span class="line"> <span class="keyword">return</span> process(self.processors)</span><br><span class="line"> </span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(self)</span>:</span></span><br><span class="line"> fn, args = self._match(self.mapping, web.ctx.path)</span><br><span class="line"> <span class="keyword">return</span> self._delegate(fn, self.fvars, args)</span><br><span class="line"> <span class="comment"># 加入请求路径是 /</span></span><br><span class="line"> <span class="comment"># _match 获得 Index 和 args</span></span><br><span class="line"> <span class="comment"># _delegate 执行 globals()中的Index的实例中meth对应方法的值返回</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2016/07/01/webpy-%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E5%88%86%E6%9E%90/#u53C2_u8003" title="参考"></a>参考</h2><p><a href="https://www.python.org/dev/peps/pep-3333/" target="_blank" rel="noopener">https://www.python.org/dev/peps/pep-3333/</a><br><a href="http://webpy.org/src/todo-list/0.3" target="_blank" rel="noopener">http://webpy.org/src/todo-list/0.3</a></p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

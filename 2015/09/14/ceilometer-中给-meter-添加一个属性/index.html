@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    ceilometer 中给 meter 添加一个属性
+  
+</title>
+
+<meta name="description" content="添加meter属性meter的volume最终会保存到数据库中，有时候希望meter能够有其他的属性。例如给meter添加一个other的属性">
+<meta name="keywords" content="openstack,ceilometer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceilometer 中给 meter 添加一个属性">
+<meta property="og:url" content="https://ly798.github.io/2015/09/14/ceilometer-中给-meter-添加一个属性/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="添加meter属性meter的volume最终会保存到数据库中，有时候希望meter能够有其他的属性。例如给meter添加一个other的属性">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ceilometer 中给 meter 添加一个属性">
+<meta name="twitter:description" content="添加meter属性meter的volume最终会保存到数据库中，有时候希望meter能够有其他的属性。例如给meter添加一个other的属性">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-ceilometer-中给-meter-添加一个属性" class="article article-type-post">
+  
+    <h1 class="article-header">
+      ceilometer 中给 meter 添加一个属性
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2015-09-14
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceilometer/">ceilometer</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="添加meter属性"><a href="#添加meter属性" class="headerlink" title="添加meter属性"></a><a href="https://ly798.github.io/2015/09/14/ceilometer-%E4%B8%AD%E7%BB%99-meter-%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E5%B1%9E%E6%80%A7/#u6DFB_u52A0meter_u5C5E_u6027" title="添加meter属性"></a>添加meter属性</h2><p>meter的volume最终会保存到数据库中，有时候希望meter能够有其他的属性。<br>例如给meter添加一个other的属性<br><a id="more"></a></p>
+<p>ceilometer/sample.py<br> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line">class <span class="function"><span class="title">Sample</span><span class="params">(object)</span></span>:</span><br><span class="line"></span><br><span class="line"> def <strong>init</strong>(self, name, type, unit, volume, user_id, project_id,</span><br><span class="line"> resource_id, timestamp, resource_metadata, source=None,</span><br><span class="line"> other=<span class="string">‘default’</span>):</span><br><span class="line"> self<span class="class">.name</span> = name</span><br><span class="line"> self<span class="class">.type</span> = type</span><br><span class="line"> self<span class="class">.unit</span> = unit</span><br><span class="line"> self<span class="class">.volume</span> = volume</span><br><span class="line"> self<span class="class">.user_id</span> = user_id</span><br><span class="line"> self<span class="class">.project_id</span> = project_id</span><br><span class="line"> self<span class="class">.resource_id</span> = resource_id</span><br><span class="line"> self<span class="class">.timestamp</span> = timestamp</span><br><span class="line"> self<span class="class">.resource_metadata</span> = resource_metadata</span><br><span class="line"> self<span class="class">.source</span> = source or cfg<span class="class">.CONF</span><span class="class">.sample_source</span></span><br><span class="line"> self<span class="class">.id</span> = <span class="function"><span class="title">str</span><span class="params">(uuid.uuid1()</span></span>)</span><br><span class="line"> self<span class="class">.other</span> = other</span><br><span class="line">…</span><br></pre></td></tr></table></figure> </p>
+<p>ceilometer/publisher/utils.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">meter_message_from_counter</span><span class="params">(sample, secret)</span>:</span></span><br><span class="line"> <span class="string">“””Make a metering message ready to be published or stored.</span><br><span class="line"></span><br><span class="line"> Returns a dictionary containing a metering message</span><br><span class="line"> for a notification message and a Sample instance.</span><br><span class="line"> “””</span></span><br><span class="line"> msg = &#123;<span class="string">‘source’</span>: sample.source,</span><br><span class="line"> <span class="string">‘counter_name’</span>: sample.name,</span><br><span class="line"> <span class="string">‘counter_type’</span>: sample.type,</span><br><span class="line"> <span class="string">‘counter_unit’</span>: sample.unit,</span><br><span class="line"> <span class="string">‘counter_volume’</span>: sample.volume,</span><br><span class="line"> <span class="string">‘user_id’</span>: sample.user_id,</span><br><span class="line"> <span class="string">‘project_id’</span>: sample.project_id,</span><br><span class="line"> <span class="string">‘resource_id’</span>: sample.resource_id,</span><br><span class="line"> <span class="string">‘timestamp’</span>: sample.timestamp,</span><br><span class="line"> <span class="string">‘resource_metadata’</span>: sample.resource_metadata,</span><br><span class="line"> <span class="string">‘message_id’</span>: sample.id,</span><br><span class="line"> <span class="string">‘other’</span>: sample.other,</span><br><span class="line"> &#125;</span><br><span class="line"> msg[<span class="string">‘message_signature’</span>] = compute_signature(msg, secret)</span><br><span class="line"> <span class="keyword">return</span> msg</span><br><span class="line">…</span><br></pre></td></tr></table></figure> </p>
+<p>这样收集的meter中就会有一个other的属性</p>
+<p>但ceilometer api还会出问题，需要作如下修改<br>ceilometer/storage/models.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sample</span><span class="params">(base.Model)</span>:</span></span><br><span class="line"> <span class="string">“””One collected data point.”””</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self,</span><br><span class="line"> source,</span><br><span class="line"> counter_name, counter_type, counter_unit, counter_volume,</span><br><span class="line"> user_id, project_id, resource_id,</span><br><span class="line"> timestamp, resource_metadata,</span><br><span class="line"> message_id,</span><br><span class="line"> message_signature,</span><br><span class="line"> recorded_at,</span><br><span class="line"> other,</span><br><span class="line"> )</span>:</span></span><br><span class="line"> …</span><br><span class="line"> base.Model.<strong>init</strong>(self,</span><br><span class="line"> source=source,</span><br><span class="line"> counter_name=counter_name,</span><br><span class="line"> counter_type=counter_type,</span><br><span class="line"> counter_unit=counter_unit,</span><br><span class="line"> counter_volume=counter_volume,</span><br><span class="line"> user_id=user_id,</span><br><span class="line"> project_id=project_id,</span><br><span class="line"> resource_id=resource_id,</span><br><span class="line"> timestamp=timestamp,</span><br><span class="line"> resource_metadata=resource_metadata,</span><br><span class="line"> message_id=message_id,</span><br><span class="line"> message_signature=message_signature,</span><br><span class="line"> recorded_at=recorded_at,</span><br><span class="line"> other=other)</span><br></pre></td></tr></table></figure> </p>
+<p>ceilometer/api/controller/v2.py<br> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line">class <span class="function"><span class="title">OldSample</span><span class="params">(_Base)</span></span>:</span><br><span class="line"> other = wtype<span class="class">.text</span></span><br><span class="line">…</span><br></pre></td></tr></table></figure> </p>
+<p>若需要定义other的值，举例ceilometer/compute<br>修改</p>
+<p>ceilometer/compute/pollsters/utils.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_sample_from_instance</span><span class="params">(instance, name, type, unit, volume,</span><br><span class="line"> resource_id=None, additional_metadata=None,</span><br><span class="line"> other)</span>:</span></span><br><span class="line"> additional_metadata = additional_metadata <span class="keyword">or</span> &#123;&#125;</span><br><span class="line"> resource_metadata = _get_metadata_from_object(instance)</span><br><span class="line"> resource_metadata.update(additional_metadata)</span><br><span class="line"> <span class="keyword">return</span> sample.Sample(</span><br><span class="line"> name=name,</span><br><span class="line"> type=type,</span><br><span class="line"> unit=unit,</span><br><span class="line"> volume=volume,</span><br><span class="line"> user_id=instance.user_id,</span><br><span class="line"> project_id=instance.tenant_id,</span><br><span class="line"> resource_id=resource_id <span class="keyword">or</span> instance.id,</span><br><span class="line"> timestamp=timeutils.isotime(),</span><br><span class="line"> resource_metadata=resource_metadata,</span><br><span class="line"> other=other,</span><br><span class="line"> )</span><br><span class="line">…</span><br></pre></td></tr></table></figure>
+
+<p>ceilometer/compute/pollsters/memory.py</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">…</span></span><br><span class="line"><span class="keyword">yield</span> util<span class="built_in">.</span>make_sample_from_instance(</span><br><span class="line"> instance,</span><br><span class="line"> name=<span class="string">‘memory.usage’</span>,</span><br><span class="line"> <span class="keyword">type</span>=sample<span class="built_in">.</span>TYPE_GAUGE,</span><br><span class="line"> unit=<span class="string">‘MB’</span>,</span><br><span class="line"> volume=memory_info<span class="built_in">.</span>usage,</span><br><span class="line"> other=xxxxxx,</span><br><span class="line"> )</span><br><span class="line"><span class="attribute">…</span></span><br></pre></td></tr></table></figure>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Ceph radosgw gc 的处理过程
+  
+</title>
+
+<meta name="description" content="介绍通过 radosgw 删除一个对象之后，默认情况下data还是存在pool中，需要通过gc来自动删除。">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph radosgw gc 的处理过程">
+<meta property="og:url" content="https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-的处理过程/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍通过 radosgw 删除一个对象之后，默认情况下data还是存在pool中，需要通过gc来自动删除。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph radosgw gc 的处理过程">
+<meta name="twitter:description" content="介绍通过 radosgw 删除一个对象之后，默认情况下data还是存在pool中，需要通过gc来自动删除。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Ceph-radosgw-gc-的处理过程" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Ceph radosgw gc 的处理过程
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2015-12-11
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>通过 radosgw 删除一个对象之后，默认情况下data还是存在pool中，需要通过gc来自动删除。<br> <a id="more"></a> </p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a><a href="https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/#u914D_u7F6E" title="配置"></a>配置</h2><p>有关 gc 的配置项有如下：</p>
+<pre><code>//查看有关gc的配置项（默认） # ceph daemon /var/run/ceph/ceph-client.radosgw.cd-ceph2.asok config show | grep gc &amp;quot;rgw_gc_max_objs&amp;quot;: &amp;quot;32&amp;quot;, &amp;quot;rgw_gc_obj_min_wait&amp;quot;: &amp;quot;7200&amp;quot;, &amp;quot;rgw_gc_processor_max_time&amp;quot;: &amp;quot;3600&amp;quot;, &amp;quot;rgw_gc_processor_period&amp;quot;: &amp;quot;3600&amp;quot;, `&lt;/pre&gt;
+
+对于配置项的解释：
+ &lt;table&gt; &lt;thead&gt; &lt;tr&gt; &lt;th style=&quot;text-align:left&quot;&gt;配置项&lt;/th&gt; &lt;th style=&quot;text-align:left&quot;&gt;描述&lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td style=&quot;text-align:left&quot;&gt;rgw gc max objs&lt;/td&gt; &lt;td style=&quot;text-align:left&quot;&gt;垃圾回收进程在一个处理周期内可处理的最大对象数。&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td style=&quot;text-align:left&quot;&gt;rgw gc obj min wait&lt;/td&gt; &lt;td style=&quot;text-align:left&quot;&gt;对象可被删除并由垃圾回收器处理前最少等待多长时间。&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td style=&quot;text-align:left&quot;&gt;rgw gc processor max time&lt;/td&gt; &lt;td style=&quot;text-align:left&quot;&gt;两个连续的垃圾回收周期起点的最大时间间隔。&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td style=&quot;text-align:left&quot;&gt;rgw gc processor period&lt;/td&gt; &lt;td style=&quot;text-align:left&quot;&gt;垃圾回收进程的运行周期。&lt;/td&gt; &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt; 
+
+## [](https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/#u8FC7_u7A0B &quot;过程&quot;)过程
+</code></pre><ol>
+<li><p>创建一个大文件，上传为一个对象</p>
+ <pre>`# dd if=/dev/zero of=./brockfile bs=1M count=100 s3cmd put ./brockfile s3://demo # s3cmd ls s3://demo 2015-12-11 04:32 104857600 s3://demo/brockfile `</pre> 
+</li>
+<li><p>查看pool中的对象数据</p>
+ <pre>`# rados ls -p .cd.rgw.buckets | grep brockfile cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.5_3 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_1 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.6_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.5_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.2_2 ... cd.4397.6_brockfile cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.3_3 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.3_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.6_1 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.2_1 # rados ls -p .cd.rgw.buckets | grep brockfile | wc -l 28 `</pre> 
+</li>
+<li><p>删除这个对象，并查看记录pool中的对象数据以及时间<br> <pre><code># s3cmd rm s3://demo/brockfile delete: &amp;apos;s3://demo/brockfile&amp;apos; # date 2015年 12月 11日 星期五 13:37:07 CST # rados ls -p .cd.rgw.buckets | grep brockfile cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.5_3 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_1 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.6_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.5_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.2_2 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.7_1 cd.4397.6__shadow_brockfile.2/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_3 ... # rados ls -p .cd.rgw.buckets | grep brockfile | wc -l 27</code></pre><br>对比删除之前pool中对象少了<code>cd.4397.6_brockfile</code>。 </p>
+</li>
+<li><p>查看gc任务<br> <pre><code># radosgw-admin --name client.radosgw.cd-ceph1 gc list [] # radosgw-admin --name client.radosgw.cd-ceph1 gc list --include-all [ { &amp;quot;tag&amp;quot;: &amp;quot;cd.4518.9&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-12-11 14:18:13.693320&amp;quot;, &amp;quot;objs&amp;quot;: []}, { &amp;quot;tag&amp;quot;: &amp;quot;cd.4751.18&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-12-11 15:36:23.285988&amp;quot;, &amp;quot;objs&amp;quot;: [ { &amp;quot;pool&amp;quot;: &amp;quot;.cd.rgw.buckets&amp;quot;, &amp;quot;oid&amp;quot;: &amp;quot;cd.4397.6__multipart_brockfile.2\/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1&amp;quot;, &amp;quot;key&amp;quot;: &amp;quot;&amp;quot;}, { &amp;quot;pool&amp;quot;: &amp;quot;.cd.rgw.buckets&amp;quot;, &amp;quot;oid&amp;quot;: &amp;quot;cd.4397.6__shadow_brockfile.2\/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_1&amp;quot;, &amp;quot;key&amp;quot;: &amp;quot;&amp;quot;}, { &amp;quot;pool&amp;quot;: &amp;quot;.cd.rgw.buckets&amp;quot;, &amp;quot;oid&amp;quot;: &amp;quot;cd.4397.6__shadow_brockfile.2\/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_2&amp;quot;, &amp;quot;key&amp;quot;: &amp;quot;&amp;quot;}, { &amp;quot;pool&amp;quot;: &amp;quot;.cd.rgw.buckets&amp;quot;, &amp;quot;oid&amp;quot;: &amp;quot;cd.4397.6__shadow_brockfile.2\/WrriwdjujTUjOrTkJM61hvs9U3aWI1S.1_3&amp;quot;, &amp;quot;key&amp;quot;: &amp;quot;&amp;quot;}, ... ]}, { &amp;quot;tag&amp;quot;: &amp;quot;cd.4526.13&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;2015-12-11 14:15:49.654526&amp;quot;, &amp;quot;objs&amp;quot;: []}]</code></pre><br> 其中出现的每一个列表元素都是一个gc任务，都是计划中的任务，时间点在<code>time</code>字段。但radosgw并不能保证在指定的时间就一定回收掉这个对象。如：<br> <pre><code># date 2015年 12月 11日 星期五 15:49:12 CST # rados ls -p .cd.rgw.buckets | grep brockfile | wc -l 27</code></pre><br> 时间已经超过，但对象仍然没有被清理，具体原因是处于定义的时间点之后的gc还未开始运行，或者已经排在了gc处理的最大对象数量之后。<br> 等待一段时间，清理成功：<br> <pre>`# rados ls -p .cd.rgw.buckets | grep brockfile | wc -l 0 [root@ceph3 ~]# date 2015年 12月 11日 星期五 16:12:51 CST </pre></p>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><a href="https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/#u603B_u7ED3" title="总结"></a>总结</h2><ul>
+<li>通过radosgw删除一个对象，是将其对象标记为删除，实质上是占用了存储空间，需要等待gc来进行清理。<em>   当删除时，会根据配置项<code>rgw gc obj min wait</code>来计算出一个该对象的删除的时间点，也就是在这个时间点才会被gc发现，并放入清理队列。</em>   而gc有配置项<code>rgw_gc_max_objs</code>，指明了一次处理的对象数，也就是说排在后面的gc任务可能会搁置到下一次gc。</li>
+<li>gc的运行频率是根据配置<code>rgw_gc_processor_max_time</code>、<code>rgw_gc_processor_period</code>来定义。 </li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2015/12/11/Ceph-radosgw-gc-%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/#u53C2_u8003" title="参考"></a>参考</h2>
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

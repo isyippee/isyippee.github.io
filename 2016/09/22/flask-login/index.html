@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    flask login
+  
+</title>
+
+<meta name="description" content="介绍使用flask-login很方便的来保存用户的登陆状态。">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask login">
+<meta property="og:url" content="https://ly798.github.io/2016/09/22/flask-login/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍使用flask-login很方便的来保存用户的登陆状态。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="flask login">
+<meta name="twitter:description" content="介绍使用flask-login很方便的来保存用户的登陆状态。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-flask-login" class="article article-type-post">
+  
+    <h1 class="article-header">
+      flask login
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-09-22
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>使用flask-login很方便的来保存用户的登陆状态。<br> <a id="more"></a> </p>
+<p>常用的有</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_login <span class="keyword">import</span> current_user, login_required, login_user, logout_user</span><br><span class="line"></span><br><span class="line"><span class="property">@login_manager</span>.user_loader</span><br></pre></td></tr></table></figure>
+
+<h3 id="login-user和logout-user"><a href="#login-user和logout-user" class="headerlink" title="login_user和logout_user"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#login_user_u548Clogout_user" title="login_user和logout_user"></a>login_user和logout_user</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login_user</span><span class="params">(user, remember=False, force=False, fresh=True)</span>:</span></span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> force <span class="keyword">and</span> <span class="keyword">not</span> user.is_active:</span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line"> <span class="comment"># current_app.login_manager.id_attribut 即 <code>get_id</code>，也就变成 user.get_id()，</span></span><br><span class="line"> <span class="comment"># 这也就是为什么user model 需要重写 get_id的原因，而不必强行规定写是因为继承的 </span></span><br><span class="line"> <span class="comment"># UserMixin 实现了 get_id() 方法</span></span><br><span class="line"> user_id = getattr(user, current_app.login_manager.id_attribute)()</span><br><span class="line"> session[<span class="string">‘user_id’</span>] = user_id</span><br><span class="line"> session[<span class="string">‘_fresh’</span>] = fresh</span><br><span class="line"> session[<span class="string">‘_id’</span>] = _create_identifier()</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> remember:</span><br><span class="line"> session[<span class="string">‘remember’</span>] = <span class="string">‘set’</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment"># 将该user放到请求上下文的栈上</span></span><br><span class="line"> _request_ctx_stack.top.user = user</span><br><span class="line"> <span class="comment"># 发送用户登陆的信号</span></span><br><span class="line"> user_logged_in.send(current_app._get_current_object(), user=_get_user())</span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logout_user</span><span class="params">()</span>:</span></span><br><span class="line"> <span class="comment"># 从ctx取的user</span></span><br><span class="line"> user = _get_user()</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> <span class="string">‘user_id’</span> <span class="keyword">in</span> session:</span><br><span class="line"> session.pop(<span class="string">‘user_id’</span>)</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> <span class="string">‘_fresh’</span> <span class="keyword">in</span> session:</span><br><span class="line"> session.pop(<span class="string">‘_fresh’</span>)</span><br><span class="line"></span><br><span class="line"> cookie_name = current_app.config.get(<span class="string">‘REMEMBER_COOKIE_NAME’</span>, COOKIE_NAME)</span><br><span class="line"> <span class="keyword">if</span> cookie_name <span class="keyword">in</span> request.cookies:</span><br><span class="line"> session[<span class="string">‘remember’</span>] = <span class="string">‘clear’</span></span><br><span class="line"> <span class="comment">#发送信号</span></span><br><span class="line"> user_logged_out.send(current_app._get_current_object(), user=user)</span><br><span class="line"></span><br><span class="line"> current_app.login_manager.reload_user()</span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">True</span></span><br></pre></td></tr></table></figure> 
+
+<h3 id="login-required"><a href="#login-required" class="headerlink" title="login_required"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#login_required" title="login_required"></a>login_required</h3><p>判断current_user是否登录，否则会找到app的login_view，使用redrect重定向。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login_required</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="decorator"> @wraps(func)</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">decorated_view</span><span class="params">(<em>args, **kwargs)</em></span>:</span></span><br><span class="line"> <span class="keyword">if</span> current_app.login_manager._login_disabled:</span><br><span class="line"> <span class="keyword">return</span> func(args, <strong>kwargs)</strong></span><br><span class="line"> <span class="keyword">elif</span> <span class="keyword">not</span> current_user.is_authenticated:</span><br><span class="line"> <span class="keyword">return</span> current_app.login_manager.unauthorized()</span><br><span class="line"> <span class="keyword">return</span> func(*args, kwargs)</span><br><span class="line"> <span class="keyword">return</span> decorated_view</span><br></pre></td></tr></table></figure>
+
+<h3 id="current-user"><a href="#current-user" class="headerlink" title="current_user"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#current_user" title="current_user"></a>current_user</h3><p>使用了werlzeng 的 LocalProxy代理获取到ctx top的user</p>
+<h3 id="user-loader"><a href="#user-loader" class="headerlink" title="user_loader"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#user_loader" title="user_loader"></a>user_loader</h3><p>就是将装饰的方法作为了回调函数用来通过id获取到user对象</p>
+<h3 id="一个问题"><a href="#一个问题" class="headerlink" title="一个问题"></a><a href="https://ly798.github.io/2016/09/22/flask-login/#u4E00_u4E2A_u95EE_u9898" title="一个问题"></a>一个问题</h3><p>在一些例子上验证当前用户是否登陆时使用的是<code>current_user.is_authenticated()</code>，自己使用会发生错误，</p>
+<p>在代码中的 UserMixin类实现这几个方法，但是使用了<code>@property</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserMixin</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="decorator"> @property</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">is_active</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line"><span class="decorator"> @property</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">is_authenticated</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line"><span class="decorator"> @property</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">is_anonymous</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">get_id</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="keyword">return</span> unicode(self.id)</span><br><span class="line"> <span class="keyword">except</span> AttributeError:</span><br><span class="line"> <span class="keyword">raise</span> NotImplementedError(<span class="string">‘No <code>id</code> attribute - override <code>get_id</code>‘</span>)</span><br></pre></td></tr></table></figure>
+
+<p>所以使用<code>current_user.is_authenticated</code>即可，之前的用法有两种可能：</p>
+<ul>
+<li>版本问题，在0.3.0之前包括0.3.0使用<code>current_user.is_authenticated()</code></li>
+<li>在 User model 中重写了方法，不使用<code>@property</code>，两种方式都可用</li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

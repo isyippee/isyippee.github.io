@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    trove backup
+  
+</title>
+
+<meta name="description" content="introductionCode Reading">
+<meta name="keywords" content="openstack trove">
+<meta property="og:type" content="article">
+<meta property="og:title" content="trove backup">
+<meta property="og:url" content="https://ly798.github.io/2016/12/19/trove-backup/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="introductionCode Reading">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="trove backup">
+<meta name="twitter:description" content="introductionCode Reading">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-trove-backup" class="article article-type-post">
+  
+    <h1 class="article-header">
+      trove backup
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-12-19
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack-trove/">openstack trove</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#introduction" title="introduction"></a>introduction</h2><p>Code Reading<br> <a id="more"></a> </p>
+<h2 id="backup"><a href="#backup" class="headerlink" title="backup"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#backup" title="backup"></a>backup</h2><p>api:create_backup —-&gt; taskmanager:create_backup —-&gt; self.guest.create_backup —-&gt; rabbitmq —-&gt; guestagent:mysql_manager:create_backup —-&gt; innobackupex —-&gt; swift put</p>
+<h3 id="taskmanager-中的-create-backup"><a href="#taskmanager-中的-create-backup" class="headerlink" title="taskmanager 中的 create_backup"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#taskmanager__u4E2D_u7684_create_backup" title="taskmanager 中的 create_backup"></a>taskmanager 中的 create_backup</h3><p>trove/taskmanager/manager.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Manager</span><span class="params">(periodic_task.PeriodicTasks)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">create_backup</span><span class="params">(self, context, backup_info, instance_id)</span>:</span></span><br><span class="line"> instance_tasks = models.BuiltInstanceTasks.load(context, instance_id)</span><br><span class="line"> instance_tasks.create_backup(backup_info)</span><br></pre></td></tr></table></figure> </p>
+<p>trove/taskmanager/models.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BuiltInstanceTasks</span><span class="params">(BuiltInstance, NotifyMixin, ConfigurationMixin)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">create_backup</span><span class="params">(self, backup_info)</span>:</span></span><br><span class="line"> LOG.info(_(<span class="string">“Initiating backup for instance %s.”</span>) % self.id)</span><br><span class="line"> self.guest.create_backup(backup_info)</span><br></pre></td></tr></table></figure> </p>
+<p>这里的 self.guest trove/instance/models.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseInstance</span><span class="params">(SimpleInstance)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">get_guest</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> create_guest_client(self.context, self.db_info.id)</span><br></pre></td></tr></table></figure> </p>
+<p>trove/common/remote.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">create_guest_client = import_class(CONF.remote_guest_client)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">guest_client</span><span class="params">(context, id, manager=None)</span>:</span></span><br><span class="line"> <span class="keyword">from</span> trove.guestagent.api <span class="keyword">import</span> API</span><br><span class="line"> <span class="keyword">if</span> manager:</span><br><span class="line"> clazz = strategy.load_guestagent_strategy(manager).guest_client_class</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> clazz = API</span><br><span class="line"> <span class="keyword">return</span> clazz(context, id)</span><br></pre></td></tr></table></figure> </p>
+<p>所以 guest 对应的是 API 实例, cast()发送消息。guestagent 接受到消息</p>
+<h3 id="guestagent-中的-createbackup"><a href="#guestagent-中的-createbackup" class="headerlink" title="guestagent 中的 createbackup"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#guestagent__u4E2D_u7684_createbackup" title="guestagent 中的 createbackup"></a>guestagent 中的 create<sub>backup</sub></h3><p>trove/guestagent/datastore/mysql/manager.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Manager</span><span class="params">(periodic_task.PeriodicTasks)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">create_backup</span><span class="params">(self, context, backup_info)</span>:</span></span><br><span class="line"> backup.backup(context, backup_info)</span><br></pre></td></tr></table></figure> </p>
+<p>trove/guestagent/backup/backupagent.py<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># innobackupex 或 mysqldump</span></span><br><span class="line">RUNNER = get_backup_strategy(STRATEGY, BACKUP_NAMESPACE)</span><br><span class="line"><span class="comment"># 额外的参数，如使用 innobackupex，可以有–user os_admin –socket /var/lib/mysql/mysql.sock</span></span><br><span class="line">EXTRA_OPTS = CONF.backup_runner_options.get(STRATEGY, <span class="string">‘’</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BackupAgent</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">stream_backup_to_storage</span><span class="params">(self, backup_info, runner, storage,</span><br><span class="line"> parent_metadata=&#123;&#125;, extra_opts=EXTRA_OPTS)</span>:</span></span><br><span class="line"> backup_id = backup_info[<span class="string">‘id’</span>]</span><br><span class="line"> ctxt = trove_context.TroveContext(</span><br><span class="line"> user=CONF.nova_proxy_admin_user,</span><br><span class="line"> auth_token=CONF.nova_proxy_admin_pass)</span><br><span class="line"> conductor = conductor_api.API(ctxt)</span><br><span class="line"></span><br><span class="line"> <span class="comment"># Store the size of the filesystem before the backup.</span></span><br><span class="line"> mount_point = CONFIG_MANAGER.mount_point</span><br><span class="line"> stats = get_filesystem_volume_stats(mount_point)</span><br><span class="line"> backup_state = &#123;</span><br><span class="line"> <span class="string">‘backup_id’</span>: backup_id,</span><br><span class="line"> <span class="string">‘size’</span>: stats.get(<span class="string">‘used’</span>, <span class="number">0.0</span>),</span><br><span class="line"> <span class="string">‘state’</span>: BackupState.BUILDING,</span><br><span class="line"> &#125;</span><br><span class="line"> conductor.update_backup(CONF.guest_id,</span><br><span class="line"> sent=timeutils.float_utcnow(),</span><br><span class="line"> <strong>backup_state)</strong></span><br><span class="line"> LOG.debug(<span class="string">“Updated state for %s to %s.”</span>, backup_id, backup_state)</span><br><span class="line"></span><br><span class="line"> <span class="keyword">with</span> runner(filename=backup_id, extra_opts=extra_opts,</span><br><span class="line"> parent_metadata) <span class="keyword">as</span> bkup:</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> LOG.debug(<span class="string">“Starting backup %s.”</span>, backup_id)</span><br><span class="line"> success, note, checksum, location = storage.save(</span><br><span class="line"> bkup.manifest,</span><br><span class="line"> bkup)</span><br><span class="line"></span><br><span class="line"> backup_state.update(&#123;</span><br><span class="line"> <span class="string">‘checksum’</span>: checksum,</span><br><span class="line"> <span class="string">‘location’</span>: location,</span><br><span class="line"> <span class="string">‘note’</span>: note,</span><br><span class="line"> <span class="string">‘success’</span>: success,</span><br><span class="line"> <span class="string">‘backup_type’</span>: bkup.backup_type,</span><br><span class="line"> &#125;)</span><br><span class="line"> . . . </span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> success:</span><br><span class="line"> <span class="keyword">raise</span> BackupError(note)</span><br><span class="line"></span><br><span class="line"> meta = bkup.metadata()</span><br><span class="line"> meta[<span class="string">‘datastore’</span>] = backup_info[<span class="string">‘datastore’</span>]</span><br><span class="line"> meta[<span class="string">‘datastore_version’</span>] = backup_info[</span><br><span class="line"> <span class="string">‘datastore_version’</span>]</span><br><span class="line"> storage.save_metadata(location, meta)</span><br><span class="line"></span><br><span class="line"> backup_state.update(&#123;<span class="string">‘state’</span>: BackupState.COMPLETED&#125;)</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> meta</span><br><span class="line"> . . .</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">execute_backup</span><span class="params">(self, context, backup_info,</span><br><span class="line"> runner=RUNNER, extra_opts=EXTRA_OPTS)</span>:</span></span><br><span class="line"></span><br><span class="line"> LOG.debug(<span class="string">“Running backup %(id)s.”</span>, backup_info)</span><br><span class="line"> storage = get_storage_strategy(</span><br><span class="line"> CONF.storage_strategy,</span><br><span class="line"> CONF.storage_namespace)(context)</span><br><span class="line"></span><br><span class="line"> <span class="comment">#是否是 incremental backup</span></span><br><span class="line"> . . . </span><br><span class="line"> self.stream_backup_to_storage(backup_info, runner, storage,</span><br><span class="line"> parent_metadata, extra_opts)</span><br></pre></td></tr></table></figure> </p>
+<p>RUNNER 对应的是 <code>trove.guestagent.strategies.backup.mysql_impl:InnoBackupEx/InnoBackupExIncremental</code> , 使用 stream backup<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BackupRunner</span><span class="params">(Strategy)</span>:</span></span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>enter</strong></span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="string">“””Start up the process.”””</span></span><br><span class="line"> self._run_pre_backup()</span><br><span class="line"> self.run()</span><br><span class="line"> <span class="keyword">return</span> self</span><br></pre></td></tr></table></figure> </p>
+<p>storage 对应的是 <code>trove.guestagent.strategies.storage.swift:SwiftStorage</code> , 从 stream read 出来 使用 swift put 上传.</p>
+<h2 id="radosgw’s-swift-api"><a href="#radosgw’s-swift-api" class="headerlink" title="radosgw’s swift api"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#radosgw_u2019s_swift_api" title="radosgw’s swift api"></a>radosgw’s swift api</h2><h3 id="rgw-集成-keystone-部分配置"><a href="#rgw-集成-keystone-部分配置" class="headerlink" title="rgw 集成 keystone 部分配置"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#rgw__u96C6_u6210_keystone__u90E8_u5206_u914D_u7F6E" title="rgw 集成 keystone 部分配置"></a>rgw 集成 keystone 部分配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rgw keystone url = http://<span class="number">192.168</span>.<span class="number">6.125</span>:<span class="number">5000</span></span><br><span class="line"><span class="comment"># 若不配置该项，需要配置 rgw_keystone_admin_user rgw_keystone_admin_password rgw_keystone_admin_tenant 三项，去请求 url 得到 admin token (rgw_swift.cc:244)</span></span><br><span class="line">rgw keystone admin token = <span class="number">85</span>cc6b3914c042fe8be37032ff03fa49</span><br></pre></td></tr></table></figure> 
+
+<h3 id="rgw-接受到-swift-请求之后处理"><a href="#rgw-接受到-swift-请求之后处理" class="headerlink" title="rgw 接受到 swift 请求之后处理"></a><a href="https://ly798.github.io/2016/12/19/trove-backup/#rgw__u63A5_u53D7_u5230_swift__u8BF7_u6C42_u4E4B_u540E_u5904_u7406" title="rgw 接受到 swift 请求之后处理"></a>rgw 接受到 swift 请求之后处理</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ret = handler-&gt;authorize();</span><br></pre></td></tr></table></figure> 
+
+<p>请求携带 token，对 token 进行验证<br> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> RGWSwift::verify_swift_token(RGWRados <em>store, req_state </em>s)</span><br></pre></td></tr></table></figure> </p>
+<p>validate<sub>token</sub> 返回详细信息和其 tenant、user、role 等信息, 对应请求的 keystone API <code>/v2.0/tokens/{tokenId}</code><br> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">validate_keystone_token(store, s-&gt;os_auth_token, &amp;info, s-&gt;user);</span><br></pre></td></tr></table></figure> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parse_keystone_token_response(token, bl, info, t)</span><br></pre></td></tr></table></figure> </p>
+<p>parse 之后的 info<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;status = <span class="number">200</span>, auth_groups = <span class="string">“”</span>, user = <span class="string">“a400d920a63642d4913e8f2f3afda408”</span>, display_name = <span class="string">“demo”</span>, ttl = <span class="number">0</span>&#125;</span><br></pre></td></tr></table></figure> <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update_user_info(store, info, rgw_user);</span><br></pre></td></tr></table></figure> </p>
+<p>对应关系：<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">info user –&gt; keystone tenant_id –&gt; rgw uid</span><br><span class="line">info display_name –&gt; keystone tenant_name –&gt; rgw display_name</span><br></pre></td></tr></table></figure> </p>
+<p>那使用 rgw swift 来作 trove backup, 但是很遗憾。trove 配置项 <code>backup_swift_container = database_backups</code> , 创建 backup 时为 tenant 创建一个 container 用来存放 backup，但是 rgw 的 bucket_name 是全局的，swift 中 container<sub>name</sub> 是 tenant 下的。当我使用第二个 tenant 去创建 backups 时，会先创建<code>database&lt;sub&gt;backups&lt;/sub&gt;</code>的 bucket，而这个 bucket 已被占用，<code>BuceketAlreadyExist</code></p>
+<p>或许可以使用 database_backups_$(tenant_id) 的 bucket 来存储，这种方式在 juno 版是可以(trove juno 使 swift DLO 方式上传)trove master 使用了 swift SLO 的方式，目前 rgw swift 不支持。so, openstack or implement s3 in trove.</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

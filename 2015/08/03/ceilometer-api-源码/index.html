@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    ceilometer api 源码
+  
+</title>
+
+<meta name="description" content="介绍版本：juno">
+<meta name="keywords" content="openstack,ceilometer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceilometer api 源码">
+<meta property="og:url" content="https://ly798.github.io/2015/08/03/ceilometer-api-源码/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍版本：juno">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ly798.github.io/2015/08/03/ceilometer-api-源码/pecanapi.jpg">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ceilometer api 源码">
+<meta name="twitter:description" content="介绍版本：juno">
+<meta name="twitter:image" content="https://ly798.github.io/2015/08/03/ceilometer-api-源码/pecanapi.jpg">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-ceilometer-api-源码" class="article article-type-post">
+  
+    <h1 class="article-header">
+      ceilometer api 源码
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2015-08-03
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceilometer/">ceilometer</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2015/08/03/ceilometer-api-%E6%BA%90%E7%A0%81/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>版本：juno<br> <a id="more"></a></p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a><a href="https://ly798.github.io/2015/08/03/ceilometer-api-%E6%BA%90%E7%A0%81/#u6D41_u7A0B" title="流程"></a>流程</h2><p>/usr/bin/ceilometer-api<br> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line">from ceilometer<span class="class">.cmd</span><span class="class">.api</span> import main</span><br><span class="line"><span class="keyword">if</span> <strong>name</strong> == <span class="string">“<strong>main</strong>“</span>:</span><br><span class="line"> sys.<span class="function"><span class="title">exit</span><span class="params">(main()</span></span>)</span><br></pre></td></tr></table></figure></p>
+<p>cmd/api.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line"> service.prepare_service()</span><br><span class="line"> srv = app.build_server()</span><br><span class="line"> srv.serve_forever()</span><br></pre></td></tr></table></figure>
+
+<p>api/app.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_server</span><span class="params">()</span>:</span></span><br><span class="line"> app = load_app()</span><br><span class="line"> …</span><br><span class="line"> srv = simple_server.make_server(host, port, app,</span><br><span class="line"> server_cls, get_handler_cls())</span><br><span class="line"> …</span><br><span class="line"> <span class="keyword">return</span> srv</span><br></pre></td></tr></table></figure><br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_app</span><span class="params">()</span>:</span></span><br><span class="line"> <span class="comment"># Build the WSGI app</span></span><br><span class="line"> …</span><br><span class="line"> <span class="keyword">return</span> deploy.loadapp(<span class="string">“config:”</span> + cfg_file)</span><br></pre></td></tr></table></figure> 
+
+<p>api_paste.ini对应app_factory</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app_factory</span><span class="params">(global_config, **local_conf)</span>:</span></span><br><span class="line"> <span class="keyword">return</span> VersionSelectorApplication()</span><br></pre></td></tr></table></figure><br> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">class <span class="function"><span class="title">VersionSelectorApplication</span><span class="params">(object)</span></span>:</span><br><span class="line"> …</span><br><span class="line"> self<span class="class">.v2</span> = <span class="function"><span class="title">setup_app</span><span class="params">(pecan_config=pc)</span></span></span><br><span class="line"> …</span><br></pre></td></tr></table></figure> <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def <span class="function"><span class="title">setup_app</span><span class="params">(pecan_config=None, extra_hooks=None)</span></span>:</span><br><span class="line"> …</span><br><span class="line"> app = pecan.make_app(</span><br><span class="line"> pecan_config<span class="class">.app</span><span class="class">.root</span>,</span><br><span class="line"> static_root=pecan_config<span class="class">.app</span><span class="class">.static_root</span>,</span><br><span class="line"> template_path=pecan_config<span class="class">.app</span><span class="class">.template_path</span>,</span><br><span class="line"> debug=CONF<span class="class">.api</span><span class="class">.pecan_debug</span>,</span><br><span class="line"> force_canonical=<span class="function"><span class="title">getattr</span><span class="params">(pecan_config.app, <span class="string">‘force_canonical’</span>, True)</span></span>,</span><br><span class="line"> hooks=app_hooks,</span><br><span class="line"> wrap_app=middleware<span class="class">.ParsableErrorMiddleware</span>,</span><br><span class="line"> guess_content_type_from_ext=False</span><br><span class="line"> )</span><br><span class="line"> return app</span><br></pre></td></tr></table></figure> 
+
+<p>这里用到了pecan。<br>pecan，一个轻量的web框架，主页<a href="http://pecan.readthedocs.org/" target="_blank" rel="noopener">http://pecan.readthedocs.org/</a><br>ceilometer中主要是用来构建restapi，主页中关于restapi部分的<a href="http://pecan.readthedocs.org/en/latest/rest.html#writing-restful-web-services-with-restcontroller" target="_blank" rel="noopener">介绍</a>,需要继承rest.RestController；<br>其中重要的部分URL Mapping：<br><img src="pecanapi.jpg" alt=""></p>
+<p>pecan的配置文件api/config.py</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">…</span><br><span class="line"><span class="atom">app</span> = &#123;</span><br><span class="line"> <span class="string">‘root’</span>: <span class="string">‘ceilometer.api.controllers.root.RootController’</span>,</span><br><span class="line"> <span class="string">‘modules’</span>: [<span class="string">‘ceilometer.api’</span>],</span><br><span class="line"> <span class="string">‘static_root’</span>: <span class="string">‘%(confdir)s/public’</span>,</span><br><span class="line"> <span class="string">‘template_path’</span>: <span class="string">‘%(confdir)s/ceilometer/api/templates’</span>,</span><br><span class="line">&#125;</span><br><span class="line">…</span><br></pre></td></tr></table></figure>
+
+<p>ceilometer.api.controllers.root.RootController.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RootController</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line"> v2 = v2.V2Controller()</span><br><span class="line"></span><br><span class="line"><span class="decorator"> @pecan.expose(generic=True, template=’index.html’)</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">(self)</span>:</span></span><br><span class="line"> <span class="comment"># <span class="doctag">FIXME:</span> Return version information</span></span><br><span class="line"> <span class="keyword">return</span> dict()</span><br></pre></td></tr></table></figure>
+
+<p>这里注意<code>v2 = v2.V2Controller()</code>，其中就写了很多的restapi<br>api/controllers/v2.py</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class <span class="function"><span class="title">V2Controller</span><span class="params">(object)</span></span>:</span><br><span class="line"> <span class="string">“”</span><span class="string">“Version 2 API controller root.”</span><span class="string">“”</span></span><br><span class="line"> resources = <span class="function"><span class="title">ResourcesController</span><span class="params">()</span></span></span><br><span class="line"> meters = <span class="function"><span class="title">MetersController</span><span class="params">()</span></span></span><br><span class="line"> samples = <span class="function"><span class="title">SamplesController</span><span class="params">()</span></span></span><br><span class="line"> alarms = <span class="function"><span class="title">AlarmsController</span><span class="params">()</span></span></span><br><span class="line"> event_types = <span class="function"><span class="title">EventTypesController</span><span class="params">()</span></span></span><br><span class="line"> events = <span class="function"><span class="title">EventsController</span><span class="params">()</span></span></span><br><span class="line"> query = <span class="function"><span class="title">QueryController</span><span class="params">()</span></span></span><br><span class="line"> capabilities = <span class="function"><span class="title">CapabilitiesController</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+
+<p>这里又加载各种对象的restapi<br>接下来就只分析其中一个，其他类似<br>这里又用到了wsme和wsmeext.pecan。<br>wsme即<a href="http://wsme.readthedocs.org/en/latest/" target="_blank" rel="noopener">Web Services Made Easy</a>，简化了REST Web服务的编写。<br>可以运行在另一个框架的顶层，如（Cornice、Flask、Pecan）等，这里就是运行在了pecan之上来更加简单的构建restapi，用法:<br><code>wsmeext.pecan.wsexpose(return_type, *arg_types, **options)</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> wsmeext.pecan <span class="keyword">as</span> wsme_pecan</span><br><span class="line">…</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResourcesController</span><span class="params">(rest.RestController)</span>:</span></span><br><span class="line"> <span class="string">“””Works on resources.”””</span></span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">_resource_links</span><span class="params">(self, resource_id, meter_links=<span class="number">1</span>)</span>:</span></span><br><span class="line"> links = [_make_link(<span class="string">‘self’</span>, pecan.request.host_url, <span class="string">‘resources’</span>,</span><br><span class="line"> resource_id)]</span><br><span class="line"> <span class="keyword">if</span> meter_links:</span><br><span class="line"> <span class="keyword">for</span> meter <span class="keyword">in</span> pecan.request.storage_conn.get_meters(</span><br><span class="line"> resource=resource_id):</span><br><span class="line"> query = &#123;<span class="string">‘field’</span>: <span class="string">‘resource_id’</span>, <span class="string">‘value’</span>: resource_id&#125;</span><br><span class="line"> links.append(_make_link(meter.name, pecan.request.host_url,</span><br><span class="line"> <span class="string">‘meters’</span>, meter.name, query=query))</span><br><span class="line"> <span class="keyword">return</span> links</span><br><span class="line"></span><br><span class="line"> <span class="comment">#这里的get_one对应的就是GET http://&lt;your ip&gt;:8777/v2/resources/&lt;resource_id&gt;</span></span><br><span class="line"> <span class="comment">#返回的为一个Resource类型</span></span><br><span class="line"> <span class="comment">#参数为unicode类型</span></span><br><span class="line"><span class="decorator"> @wsme_pecan.wsexpose(Resource, unicode)</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">get_one</span><span class="params">(self, resource_id)</span>:</span></span><br><span class="line"> <span class="string">“””Retrieve details about one resource.</span><br><span class="line"> :param resource_id: The UUID of the resource.</span><br><span class="line"> “””</span></span><br><span class="line"> authorized_project = acl.get_limited_to_project(pecan.request.headers)</span><br><span class="line"> resources = list(pecan.request.storage_conn.get_resources(</span><br><span class="line"> resource=resource_id, project=authorized_project))</span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> resources:</span><br><span class="line"> <span class="keyword">raise</span> EntityNotFound(_(<span class="string">‘Resource’</span>), resource_id)</span><br><span class="line"> <span class="keyword">return</span> Resource.from_db_and_links(resources[<span class="number">0</span>],</span><br><span class="line"> self._resource_links(resource_id))</span><br><span class="line"> <span class="comment">#这里的get_all对应的就是GET http://&lt;your ip&gt;:8777/v2/resources[?meter_links=&#123;meter_links&#125;&amp;</span></span><br><span class="line"> <span class="comment">#q.field=&#123;field&#125;&amp;q.op=&#123;operator&#125;&amp;q.type=&#123;type&#125;&amp;q.value=&#123;value&#125;]</span></span><br><span class="line"> <span class="comment">#返回类型是包含Resource的序列</span></span><br><span class="line"> <span class="comment">#参数类型是包含Query的序列</span></span><br><span class="line"><span class="decorator"> @wsme_pecan.wsexpose([Resource], [Query], int)</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">get_all</span><span class="params">(self, q=None, meter_links=<span class="number">1</span>)</span>:</span></span><br><span class="line"> <span class="string">“””Retrieve definitions of all of the resources.</span><br><span class="line"> :param q: Filter rules for the resources to be returned.</span><br><span class="line"> :param meter_links: option to include related meter links</span><br><span class="line"> “””</span></span><br><span class="line"> q = q <span class="keyword">or</span> []</span><br><span class="line"> kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)</span><br><span class="line"> resources = [</span><br><span class="line"> Resource.from_db_and_links(r,</span><br><span class="line"> self._resource_links(r.resource_id,</span><br><span class="line"> meter_links))</span><br><span class="line"> <span class="keyword">for</span> r <span class="keyword">in</span> pecan.request.storage_conn.get_resources(**kwargs)]</span><br><span class="line"> <span class="keyword">return</span> resources</span><br></pre></td></tr></table></figure>
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

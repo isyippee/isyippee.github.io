@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Python ConfigParser模块和Openstack olso.cfg模块
+  
+</title>
+
+<meta name="description" content="介绍ConfigParserConfigParser实现了一种可用来解析ini配置文件配置项的语言。关于ini配置文件的有一些规则，  需要使用[section]来标识 配置使用kv形式，两种方式k = v或者k : v 使用#和;来进行注释">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python ConfigParser模块和Openstack olso.cfg模块">
+<meta property="og:url" content="https://ly798.github.io/2016/06/25/Python-ConfigParser模块和Openstack-olso-cfg模块/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍ConfigParserConfigParser实现了一种可用来解析ini配置文件配置项的语言。关于ini配置文件的有一些规则，  需要使用[section]来标识 配置使用kv形式，两种方式k = v或者k : v 使用#和;来进行注释">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python ConfigParser模块和Openstack olso.cfg模块">
+<meta name="twitter:description" content="介绍ConfigParserConfigParser实现了一种可用来解析ini配置文件配置项的语言。关于ini配置文件的有一些规则，  需要使用[section]来标识 配置使用kv形式，两种方式k = v或者k : v 使用#和;来进行注释">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Python-ConfigParser模块和Openstack-olso-cfg模块" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Python ConfigParser模块和Openstack olso.cfg模块
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-06-25
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><h3 id="ConfigParser"><a href="#ConfigParser" class="headerlink" title="ConfigParser"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#ConfigParser" title="ConfigParser"></a>ConfigParser</h3><p>ConfigParser实现了一种可用来解析ini配置文件配置项的语言。关于ini配置文件的有一些规则，</p>
+<ol>
+<li>需要使用<code>[section]</code>来标识</li>
+<li>配置使用kv形式，两种方式<code>k = v</code>或者<code>k : v</code></li>
+<li>使用<code>#</code>和<code>;</code>来进行注释 <a id="more"></a> </li>
+</ol>
+<p>结构类似如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[default]</span><br><span class="line"># comments</span><br><span class="line">; comments</span><br><span class="line">name = value</span><br><span class="line">name : value</span><br></pre></td></tr></table></figure>
+
+<h4 id="ConfigParser模块常用方法"><a href="#ConfigParser模块常用方法" class="headerlink" title="ConfigParser模块常用方法"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#ConfigParser_u6A21_u5757_u5E38_u7528_u65B9_u6CD5" title="ConfigParser模块常用方法"></a>ConfigParser模块常用方法</h4><h5 id="读取操作"><a href="#读取操作" class="headerlink" title="读取操作"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#u8BFB_u53D6_u64CD_u4F5C" title="读取操作"></a>读取操作</h5><ol>
+<li>read(file)</li>
+<li>sections()</li>
+<li>get(section, option)</li>
+<li>getint(section, option)</li>
+<li>getboolean(section, option)</li>
+<li>has_section(section)</li>
+<li>has_option(section, option) </li>
+</ol>
+<h5 id="写入操作"><a href="#写入操作" class="headerlink" title="写入操作"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#u5199_u5165_u64CD_u4F5C" title="写入操作"></a>写入操作</h5><ol>
+<li>add_section(section)</li>
+<li>set(section, option, value)</li>
+<li>remove_option(section, option)</li>
+<li>remove_section(section)</li>
+<li>write(file) </li>
+</ol>
+<h3 id="oslo-config"><a href="#oslo-config" class="headerlink" title="oslo.config"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#oslo-config" title="oslo.config"></a>oslo.config</h3><p>oslo是用来为openstak各个组建提供一个common库，其中也就包括了olso.config，用来解析命令行参数和配置文件。</p>
+<ul>
+<li>解析自定义的参数,在openstack中，一般都提供默认值</li>
+<li>解析一些公共的参数，如<code>--debug</code>、<code>--verbose</code></li>
+<li>olso.config使用的配置文件是服务启动命令带有的参数<code>--config-file</code>，可指定多个。若未指定，会到默认的几个路径搜索。 </li>
+</ul>
+<p>使用步骤是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> oslo_config <span class="keyword">import</span> cfg</span><br><span class="line"></span><br><span class="line">backup_manager_opts = [</span><br><span class="line"> cfg.StrOpt(<span class="string">‘backup_driver’</span>,</span><br><span class="line"> default=<span class="string">‘cinder.backup.drivers.swift’</span>,</span><br><span class="line"> help=<span class="string">‘Driver to use for backups.’</span>,</span><br><span class="line"> deprecated_name=<span class="string">‘backup_service’</span>),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">CONF = cfg.CONF</span><br><span class="line">CONF.register_opts(backup_manager_opts)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> CONF.backup_manager_opts</span><br></pre></td></tr></table></figure>
+
+<p>相比ConfigParser，oslo.config强大的多，但在自己的小程序中需要自定义配置时，使用ConfigParser足够了。</p>
+<h2 id="use"><a href="#use" class="headerlink" title="use"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#use" title="use"></a>use</h2><p>使用ConfigParser来为一般的daemon程序来写一个简单的cfg模块<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">“””</span><br><span class="line">config.py</span><br><span class="line">for example:</span><br><span class="line"> import config as cfg</span><br><span class="line"></span><br><span class="line"> CONF = cfg.CONF</span><br><span class="line"></span><br><span class="line"> CONF.get(‘default’, ‘test’)</span><br><span class="line">“””</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> ConfigParser</span><br><span class="line"></span><br><span class="line">cfg_file = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConfigOpts</span><span class="params">(ConfigParser.ConfigParser)</span>:</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>init</strong></span><span class="params">(self)</span>:</span></span><br><span class="line"> ConfigParser.ConfigParser.<strong>init</strong>(self)</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title"><strong>call</strong></span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line"> self.read(args[<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line">CONF = ConfigOpts()</span><br></pre></td></tr></table></figure> </p>
+<p>在程序的main函数中，获取args调用cfg的<strong>call</strong>，通过该方法来制定配置文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">“””</span><br><span class="line">main.py</span><br><span class="line">“””</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> config <span class="keyword">as</span> cfg</span><br><span class="line"></span><br><span class="line">CONF = cfg.CONF</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line"> CONF(sys.argv[<span class="number">1</span>:])</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> <strong>name</strong> == <span class="string">‘<strong>main</strong>‘</span>:</span><br><span class="line"> main()</span><br></pre></td></tr></table></figure>
+
+<p>这样，运行程序的时候，如<code>python main.py /etc/test.conf</code>，就能读取到该配置文件的配置项，使用<code>CONG.get(section, option)</code>就可以取的配置项。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="https://ly798.github.io/2016/06/25/Python-ConfigParser-%E6%A8%A1%E5%9D%97%E5%92%8C-Openstack-olso.cfg-%E6%A8%A1%E5%9D%97/#u53C2_u8003" title="参考"></a>参考</h2><p><code>https://docs.python.org/2/library/configparser.html</code><br><code>https://wiki.openstack.org/wiki/Oslo/Config</code></p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

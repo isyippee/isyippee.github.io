@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Radosgw object 命令以及伪文件夹
+  
+</title>
+
+<meta name="description" content="介绍在 rgw 中，对创建的对象的命名有一定的规则，长度限制。">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Radosgw object 命令以及伪文件夹">
+<meta property="og:url" content="https://ly798.github.io/2016/03/07/Radosgw-object-命令以及伪文件夹/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍在 rgw 中，对创建的对象的命名有一定的规则，长度限制。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Radosgw object 命令以及伪文件夹">
+<meta name="twitter:description" content="介绍在 rgw 中，对创建的对象的命名有一定的规则，长度限制。">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-Radosgw-object-命令以及伪文件夹" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Radosgw object 命令以及伪文件夹
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2016-03-07
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceph/">ceph</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2016/03/07/Radosgw-object-%E5%91%BD%E5%90%8D%E4%BB%A5%E5%8F%8A%E4%BC%AA%E6%96%87%E4%BB%B6%E5%A4%B9/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>在 rgw 中，对创建的对象的命名有一定的规则，长度限制。<br> <a id="more"></a> </p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a><a href="https://ly798.github.io/2016/03/07/Radosgw-object-%E5%91%BD%E5%90%8D%E4%BB%A5%E5%8F%8A%E4%BC%AA%E6%96%87%E4%BB%B6%E5%A4%B9/#u5206_u6790" title="分析"></a>分析</h2><p>rgw_rest.cc:1070</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// “The name for a key is a sequence of Unicode characters whose UTF-8 encoding</span></span><br><span class="line"><span class="comment">// is at most 1024 bytes long.”</span></span><br><span class="line"><span class="comment">// However, we can still have control characters and other nasties in there.</span></span><br><span class="line"><span class="comment">// Just as long as they’re utf-8 nasties.</span></span><br><span class="line"><span class="keyword">int</span> RGWHandler_ObjStore::validate_object_name(<span class="keyword">const</span> <span class="built_in">string</span>&amp; object)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">int</span> len = object.size();</span><br><span class="line"> <span class="keyword">if</span> (len &gt; <span class="number">1024</span>) &#123;</span><br><span class="line"> <span class="comment">// Name too long</span></span><br><span class="line"> <span class="keyword">return</span> -ERR_INVALID_OBJECT_NAME;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> (check_utf8(object.c_str(), len)) &#123;</span><br><span class="line"> <span class="comment">// Object names must be valid UTF-8.</span></span><br><span class="line"> <span class="keyword">return</span> -ERR_INVALID_OBJECT_NAME;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>object 的名字通过 rest 传过来是需要编码成 utf8，所以这里的 <code>len</code>指的是 utf8 的字节数，字节数不能超过 1024。</p>
+<blockquote>
+<p>在 utf8 中每个字母数字1个字节，大多数汉字每个占3个字节。 </p>
+</blockquote>
+<h3 id="伪文件夹"><a href="#伪文件夹" class="headerlink" title="伪文件夹"></a><a href="https://ly798.github.io/2016/03/07/Radosgw-object-%E5%91%BD%E5%90%8D%E4%BB%A5%E5%8F%8A%E4%BC%AA%E6%96%87%E4%BB%B6%E5%A4%B9/#u4F2A_u6587_u4EF6_u5939" title="伪文件夹"></a>伪文件夹</h3><p>在 rgw 中是没有文件夹的概念的，但是可以通过对对象的命名通过字符<code>/</code>来分割，然后对对象进行分类分层就可以视作文件夹；</p>
+<p>若是仅创建一个文件夹，其实质也是一个对象，其命名如 <code>folder/</code>，且该对象 Content-Length: 0；</p>
+<p>举个例子：</p>
+<figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">folder1/</span><br><span class="line">-<span class="ruby">—object1</span><br><span class="line"></span>-<span class="ruby">—folder2/</span><br><span class="line"></span>-<span class="ruby">—folder3/object2</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的目录结构中存在的对象有如下4个：</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">folder<span class="number">1</span>/</span><br><span class="line">folder<span class="number">1</span>/<span class="keyword">object</span><span class="number">1</span></span><br><span class="line">folder<span class="number">1</span>/folder<span class="number">2</span>/</span><br><span class="line">folder<span class="number">1</span>/folder<span class="number">3</span>/<span class="keyword">object</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>上级文件夹与下级文件没有实质性的关系，如文件夹 /folder1/ 与 文件夹/folder1/folder2/，两者是相互独立的对象，只是第二个文件夹名字前缀是第一个文件夹的名字。</p>
+<p>这里牵涉到命名长度的问题了：</p>
+<ul>
+<li>若全使用字母数字，则最大长度为 1024-1(字符’/‘) = 1023；</li>
+<li>若全是用汉字，则最大长度为 (1024-1)/3 = 341； </li>
+</ul>
+<p>所以无论多少级文件夹（对象名字中有多少个’/‘），只要保证对象名字的字节数不大于 1024 即可。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

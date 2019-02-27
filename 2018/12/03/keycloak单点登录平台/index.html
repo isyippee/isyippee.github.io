@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    keycloak单点登录平台
+  
+</title>
+
+<meta name="description" content="introductionkeycloak(https://github.com/keycloak/keycloak)提供了统一鉴权和权限控制功能，支持SSO(单点登录)，适合来统一多个应用的认证系统。常用的协议有oidc">
+<meta name="keywords" content="keycloak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="keycloak单点登录平台">
+<meta property="og:url" content="https://ly798.github.io/2018/12/03/keycloak单点登录平台/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="introductionkeycloak(https://github.com/keycloak/keycloak)提供了统一鉴权和权限控制功能，支持SSO(单点登录)，适合来统一多个应用的认证系统。常用的协议有oidc">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.886Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="keycloak单点登录平台">
+<meta name="twitter:description" content="introductionkeycloak(https://github.com/keycloak/keycloak)提供了统一鉴权和权限控制功能，支持SSO(单点登录)，适合来统一多个应用的认证系统。常用的协议有oidc">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-keycloak单点登录平台" class="article article-type-post">
+  
+    <h1 class="article-header">
+      keycloak单点登录平台
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2018-12-03
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/keycloak/">keycloak</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h1 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h1><p>keycloak<a href="https://github.com/keycloak/keycloak" target="_blank" rel="noopener">(https://github.com/keycloak/keycloak)</a>提供了统一鉴权和权限控制功能，支持SSO(单点登录)，适合来统一多个应用的认证系统。常用的协议有<a href="https://openid.net/connect/" target="_blank" rel="noopener">oidc</a><br><a id="more"></a></p>
+<h1 id="简单部署"><a href="#简单部署" class="headerlink" title="简单部署"></a>简单部署</h1><p>使用docker方式部署，生产环境作好数据库备份<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run --name db -d -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password -e POSTGRES_DB=keycloak postgres:11.1</span><br><span class="line">docker run --name keycloak -d --link db:db -e DB_VENDOR=postgres -e DB_ADDR=db -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -p 8080:8080 jboss/keycloak:4.8.1.Final</span><br></pre></td></tr></table></figure></p>
+<p>浏览器登录<code>http://127.0.0.1:8080</code>为keycloak的管理界面</p>
+<h1 id="应用集成"><a href="#应用集成" class="headerlink" title="应用集成"></a>应用集成</h1><p>keycloak支持对部分语言的adapter(可以直接将adapter集成到应用中)，adapter方式是应用直接将适配器集成到应用，应用调用adapter的接口来进行认证即可:</p>
+<ul>
+<li>java(servlet、jboos、sprintboot、jetty、tomcat)</li>
+<li>javascript(第三方的angular-keycloak)</li>
+<li>nodejs</li>
+</ul>
+<p>使用这些adapter的架构:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">                              ------------</span><br><span class="line">                              | keycloak |</span><br><span class="line">                              ------------</span><br><span class="line">                                   |</span><br><span class="line">                                   |</span><br><span class="line">                          ---------|----------------------</span><br><span class="line">-----------               |   ------------------------   |</span><br><span class="line">|  浏览器  | &lt;---------------&gt; | app(include adapter) |   |</span><br><span class="line">-----------               |   ------------------------   |</span><br><span class="line">                          --------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>具有adapter的语言应用可以很少代价的集成keycloak，其他语言(如python)集成可以依赖oidc协议实现的库来集成，但或多或少有缺陷(如不支持单点登出)。所以keycloak另外提供了keycloak-gatekeeper代理程序来解决，后面介绍。</p>
+<h1 id="keycloak-gatekeeper"><a href="#keycloak-gatekeeper" class="headerlink" title="keycloak-gatekeeper"></a>keycloak-gatekeeper</h1><p>如果语言没有adapter支持，可以使用keycloak-gatekeeper代理服务实现。keycloak-gatekeeper是一个web服务的代理程序，可以代替被代理的web服务进行认证，可以当作带认证nginx反向代理，只不过keycloak-gatekeeper的后端使用的还是keycloak。</p>
+<p>使用keycloak-gatekeeper的架构:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">                              ------------</span><br><span class="line">                              | keycloak |</span><br><span class="line">                              ------------</span><br><span class="line">                                   |</span><br><span class="line">                                   |</span><br><span class="line">                          ---------|---------------------------------</span><br><span class="line">-----------               |   -----------------------      -------  |</span><br><span class="line">|  浏览器  | &lt;---------------&gt; | keycloak-gatekeeper | &lt;--&gt; | app |  |</span><br><span class="line">-----------               |   -----------------------      -------  |</span><br><span class="line">                          -------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<h2 id="集成"><a href="#集成" class="headerlink" title="集成"></a>集成</h2><p>以flask为例，在本地运行个简单程序<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request, redirect, abort</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello_world</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> request.headers.get(<span class="string">'X-Auth-Userid'</span>) == <span class="string">'user_1'</span>:</span><br><span class="line">        abort(<span class="number">403</span>)</span><br><span class="line">    txt = <span class="string">'''Hello, World!</span></span><br><span class="line"><span class="string">    &lt;a href="/oauth/logout?redirect="&gt;logout&lt;/a&gt;</span></span><br><span class="line"><span class="string">    &lt;hr&gt;</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line">    <span class="keyword">for</span> h <span class="keyword">in</span> request.headers:</span><br><span class="line">        txt += <span class="string">"&lt;p&gt;%s: %s&lt;/p&gt;"</span> % h</span><br><span class="line">    <span class="keyword">return</span> txt</span><br></pre></td></tr></table></figure></p>
+<p>启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flask run -h 127.0.0.1 -p 5001</span><br></pre></td></tr></table></figure></p>
+<p>运行一个keycloak-gatekeeper带代理5001<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm --name keycloak-gatekeeper --net host -v `pwd`/config.yaml:/config.yaml ly798/keycloak-gatekeeper</span><br></pre></td></tr></table></figure></p>
+<p>config.yml部分配置如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">listen: :8181</span><br><span class="line">redirection-url: http://192.168.110.41:8181</span><br><span class="line">upstream-url: http://127.0.0.1:5001</span><br></pre></td></tr></table></figure></p>
+<p>浏览器访问<code>http://192.168.110.41:8181</code>即可，这样使没有adapter的应用也能简单的集成。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

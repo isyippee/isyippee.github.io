@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    ceilometer-alarm 源码
+  
+</title>
+
+<meta name="description" content="介绍以一个alarm为例">
+<meta name="keywords" content="openstack,ceilometer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceilometer-alarm 源码">
+<meta property="og:url" content="https://ly798.github.io/2015/07/25/ceilometer-alarm-源码/index.html">
+<meta property="og:site_name" content="LYang blog">
+<meta property="og:description" content="介绍以一个alarm为例">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-27T02:19:55.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ceilometer-alarm 源码">
+<meta name="twitter:description" content="介绍以一个alarm为例">
+
+
+  <link rel="alternative" href="/atom.xml" title="LYang blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body class="monochrome">
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">LYang blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">LYang blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Liu Yang</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="/avatar.png"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">标签</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceilometer/">ceilometer</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ceph/">ceph</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cloudfoundry/">cloudfoundry</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keycloak/">keycloak</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack/">openstack</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstack-trove/">openstack trove</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a><span class="tag-list-count">7</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">归档</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">27</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015</a><span class="archive-list-count">11</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="homepage">homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="byyear">byyear</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/ly798" title="github" target="_blank" rel="noopener">github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="mailto:yippeetry@gmail.com" title="email">email</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/about" title="about">about</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-ceilometer-alarm-源码" class="article article-type-post">
+  
+    <h1 class="article-header">
+      ceilometer-alarm 源码
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2015-07-25
+</span>
+
+    
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ceilometer/">ceilometer</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openstack/">openstack</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><a href="https://ly798.github.io/2015/07/25/ceilometer-alarm-%E6%BA%90%E7%A0%81/#u4ECB_u7ECD" title="介绍"></a>介绍</h2><p>以一个alarm为例<br><a id="more"></a><br> <figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">+—————————|<span class="string">—————————————————–+</span><br><span class="line"></span>|<span class="string"> Property </span>|<span class="string"> Value </span>|</span><br><span class="line">+—————————|<span class="string">—————————————————–+</span><br><span class="line"></span>|<span class="string"> alarm_actions </span>|<span class="string"> [u’log://‘] </span>|</span><br><span class="line">|<span class="string"> alarm_id </span>|<span class="string"> a020c017-b2a9-422e-b1bc-c414c98091d1 </span>|</span><br><span class="line">|<span class="string"> comparison_operator </span>|<span class="string"> gt </span>|</span><br><span class="line">|<span class="string"> description </span>|<span class="string"> instance running hot </span>|</span><br><span class="line">|<span class="string"> enabled </span>|<span class="string"> True </span>|</span><br><span class="line">|<span class="string"> evaluation_periods </span>|<span class="string"> 3 </span>|</span><br><span class="line">|<span class="string"> exclude_outliers </span>|<span class="string"> False </span>|</span><br><span class="line">|<span class="string"> insufficient_data_actions </span>|<span class="string"> [] </span>|</span><br><span class="line">|<span class="string"> meter_name </span>|<span class="string"> cpu_util </span>|</span><br><span class="line">|<span class="string"> name </span>|<span class="string"> cpu_high </span>|</span><br><span class="line">|<span class="string"> ok_actions </span>|<span class="string"> [] </span>|</span><br><span class="line">|<span class="string"> period </span>|<span class="string"> 600 </span>|</span><br><span class="line">|<span class="string"> project_id </span>|<span class="string"> </span>|</span><br><span class="line">|<span class="string"> query </span>|<span class="string"> resource_id == 0da3f008-60d7-4b10-a7eb-b143a842a25b </span>|</span><br><span class="line">|<span class="string"> repeat_actions </span>|<span class="string"> False </span>|</span><br><span class="line">|<span class="string"> state </span>|<span class="string"> ok </span>|</span><br><span class="line">|<span class="string"> statistic </span>|<span class="string"> avg </span>|</span><br><span class="line">|<span class="string"> threshold </span>|<span class="string"> 70.0 </span>|</span><br><span class="line">|<span class="string"> type </span>|<span class="string"> threshold </span>|</span><br><span class="line">|<span class="string"> user_id </span>|<span class="string"> 3dbf0919d60d4025842e6ea149e4aeba </span>|</span><br><span class="line">+—————————|<span class="string">—————————————————–+</span></span><br></pre></td></tr></table></figure> </p>
+<p>此alarm为threshold类型，其方法调用在<br>ceilometer/alarm/evaluator/threshold.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluate</span><span class="params">(self, alarm)</span>:</span></span><br><span class="line"> <span class="comment">#判断是否在包含的时间内</span></span><br><span class="line"> <span class="keyword">if</span> <span class="keyword">not</span> self.within_time_constraint(alarm):</span><br><span class="line"> LOG.debug(_(<span class="string">‘Attempted to evaluate alarm %s, but it is not ‘</span></span><br><span class="line"> <span class="string">‘within its time constraint.’</span>) % alarm.alarm_id)</span><br><span class="line"> <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line"> query = self._bound_duration(</span><br><span class="line"> alarm,</span><br><span class="line"> alarm.rule[<span class="string">‘query’</span>]</span><br><span class="line"> )</span><br><span class="line"></span><br><span class="line"> statistics = self._sanitize(</span><br><span class="line"> alarm,</span><br><span class="line"> self._statistics(alarm, query)</span><br><span class="line"> )</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> self._sufficient(alarm, statistics):</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">_compare</span><span class="params">(stat)</span>:</span></span><br><span class="line"> op = COMPARATORS[alarm.rule[<span class="string">‘comparison_operator’</span>]]</span><br><span class="line"> value = getattr(stat, alarm.rule[<span class="string">‘statistic’</span>])</span><br><span class="line"> limit = alarm.rule[<span class="string">‘threshold’</span>]</span><br><span class="line"> LOG.debug(_(<span class="string">‘comparing value %(value)s against threshold’</span></span><br><span class="line"> <span class="string">‘ %(limit)s’</span>) %</span><br><span class="line"> &#123;<span class="string">‘value’</span>: value, <span class="string">‘limit’</span>: limit&#125;)</span><br><span class="line"> <span class="keyword">return</span> op(value, limit)</span><br><span class="line"></span><br><span class="line"> self._transition(alarm,</span><br><span class="line"> statistics,</span><br><span class="line"> map(_compare, statistics))</span><br></pre></td></tr></table></figure>
+
+<p>先分析</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query = self._bound_duration(</span><br><span class="line"> <span class="keyword">alarm</span>,</span><br><span class="line"> <span class="keyword">alarm</span>.rule[<span class="string">‘query’</span>]</span><br><span class="line"> )</span><br></pre></td></tr></table></figure>
+
+<p>这里的alarm.rule[‘query’]为resource_id == 0da3f008-60d7-4b10-a7eb-b143a842a25b</p>
+<p>在查看函数_bound_duration</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="decorator">@classmethod</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">_bound_duration</span><span class="params">(cls, alarm, constraints)</span>:</span></span><br><span class="line"> <span class="string">“””Bound the duration of the statistics query.”””</span></span><br><span class="line"> now = timeutils.utcnow()</span><br><span class="line"> <span class="comment"># when exclusion of weak datapoints is enabled, we extend</span></span><br><span class="line"> <span class="comment"># the look-back period so as to allow a clearer sample count</span></span><br><span class="line"> <span class="comment"># trend to be established</span></span><br><span class="line"> look_back = (cls.look_back <span class="keyword">if</span> <span class="keyword">not</span> alarm.rule.get(<span class="string">‘exclude_outliers’</span>)</span><br><span class="line"> <span class="keyword">else</span> alarm.rule[<span class="string">‘evaluation_periods’</span>])</span><br><span class="line"></span><br><span class="line"> window = (alarm.rule[<span class="string">‘period’</span>] *</span><br><span class="line"> (alarm.rule[<span class="string">‘evaluation_periods’</span>] + look_back))</span><br><span class="line"> start = now - datetime.timedelta(seconds=window)</span><br><span class="line"> LOG.debug(_(<span class="string">‘query stats from %(start)s to ‘</span></span><br><span class="line"> <span class="string">‘%(now)s’</span>) % &#123;<span class="string">‘start’</span>: start, <span class="string">‘now’</span>: now&#125;)</span><br><span class="line"> after = dict(field=<span class="string">‘timestamp’</span>, op=<span class="string">‘ge’</span>, value=start.isoformat())</span><br><span class="line"> before = dict(field=<span class="string">‘timestamp’</span>, op=<span class="string">‘le’</span>, value=now.isoformat())</span><br><span class="line"> constraints.extend([before, after])</span><br><span class="line"> <span class="keyword">return</span> constraints</span><br></pre></td></tr></table></figure>
+
+<p>这个函数主要计算evaluate的时间段;</p>
+<ul>
+<li>结束时间即before为now;</li>
+<li><p>开始时间为after即start为now – period*(evaluation_periods + lookback)</p>
+<ul>
+<li>evaluation_periods</li>
+<li>look_back:这个参数是reporting/ingestion的延迟时间，可以忽略的细节;*   然后将时间段这个过滤条件加到query中返回; </li>
+</ul>
+</li>
+</ul>
+<p>接下来函数_sanitize</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="label">statistics</span> = <span class="keyword">self._sanitize(</span><br><span class="line"></span> alarm,</span><br><span class="line"> <span class="keyword">self._statistics(alarm, </span>query)</span><br><span class="line"> )</span><br></pre></td></tr></table></figure>
+
+<p>这个函数就是判断是否清洗数据，用方差的方式;<br>其中数据的来源是函数_statistics;<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title"><em>statistics</em></span><span class="params">(self, alarm, query)</span>:</span></span><br><span class="line"> LOG.debug((<span class="string">‘stats query %s’</span>) % query)</span><br><span class="line"> <span class="keyword">try</span>:</span><br><span class="line"> <span class="keyword">return</span> self._client.statistics.list(</span><br><span class="line"> meter_name=alarm.rule[<span class="string">‘meter_name’</span>], q=query,</span><br><span class="line"> period=alarm.rule[<span class="string">‘period’</span>])</span><br><span class="line"> <span class="keyword">except</span> Exception:</span><br><span class="line"> LOG.exception(_(<span class="string">‘alarm stats retrieval failed’</span>))</span><br><span class="line"> <span class="keyword">return</span> []</span><br></pre></td></tr></table></figure> </p>
+<p>这里穿进来的query就包括resource_id == 0da3f008-60d7-4b10-a7eb-b143a842a25b、[after,before];<br>这里的_client是调用的ceilometerclient/v2/client.py，通过分析，最终定位到ceilometerclient/v2/statistics.py中的list方法;</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">list</span><span class="params">(self, meter_name, q=None, period=None, groupby=None,</span><br><span class="line"> aggregates=None)</span>:</span></span><br><span class="line"> groupby = groupby <span class="keyword">or</span> []</span><br><span class="line"> aggregates = aggregates <span class="keyword">or</span> []</span><br><span class="line"> p = [<span class="string">‘period=%s’</span> % period] <span class="keyword">if</span> period <span class="keyword">else</span> []</span><br><span class="line"> <span class="keyword">if</span> isinstance(groupby, six.string_types):</span><br><span class="line"> groupby = [groupby]</span><br><span class="line"> p.extend([<span class="string">‘groupby=%s’</span> % g <span class="keyword">for</span> g <span class="keyword">in</span> groupby] <span class="keyword">if</span> groupby <span class="keyword">else</span> [])</span><br><span class="line"> p.extend(self._build_aggregates(aggregates))</span><br><span class="line"> <span class="keyword">return</span> self._list(options.build_url(</span><br><span class="line"> <span class="string">‘/v2/meters/‘</span> + meter_name + <span class="string">‘/statistics’</span>,</span><br><span class="line"> q, p))</span><br></pre></td></tr></table></figure>
+
+<p>其中根据meter_name、perioed、query等构建一个url返回;<br>然后回到了ceilometerclient/common/base.py中的base.Manager的方法_list;</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def _list(self, url, response_key=None, obj_class=None, body=None,</span><br><span class="line"> expect_single=False):</span><br><span class="line"> try:</span><br><span class="line"> resp = self<span class="class">.api</span><span class="class">.get</span>(url)</span><br><span class="line"> except exceptions<span class="class">.NotFound</span>:</span><br><span class="line"> raise exc<span class="class">.HTTPNotFound</span></span><br><span class="line"> <span class="keyword">if</span> not resp<span class="class">.content</span>:</span><br><span class="line"> raise exc<span class="class">.HTTPNotFound</span></span><br><span class="line"> <span class="tag">body</span> = resp.<span class="function"><span class="title">json</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> obj_class is None:</span><br><span class="line"> obj_class = self<span class="class">.resource_class</span></span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> response_key:</span><br><span class="line"> try:</span><br><span class="line"> data = <span class="tag">body</span>[response_key]</span><br><span class="line"> except KeyError:</span><br><span class="line"> return []</span><br><span class="line"> <span class="keyword">else</span>:</span><br><span class="line"> data = <span class="tag">body</span></span><br><span class="line"> <span class="keyword">if</span> expect_single:</span><br><span class="line"> data = [data]</span><br><span class="line"> return [<span class="function"><span class="title">obj_class</span><span class="params">(self, res, loaded=True)</span></span> <span class="keyword">for</span> res <span class="keyword">in</span> data <span class="keyword">if</span> res]</span><br></pre></td></tr></table></figure>
+
+<p>这个使用GET去查到了数据返回;<br>最后回到evaluate方法_sufficient</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> self._sufficient(alarm, statistics):</span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">_compare</span><span class="params">(stat)</span>:</span></span><br><span class="line"> op = COMPARATORS[alarm.rule[<span class="string">‘comparison_operator’</span>]]</span><br><span class="line"> value = getattr(stat, alarm.rule[<span class="string">‘statistic’</span>])</span><br><span class="line"> limit = alarm.rule[<span class="string">‘threshold’</span>]</span><br><span class="line"> LOG.debug(_(<span class="string">‘comparing value %(value)s against threshold’</span></span><br><span class="line"> <span class="string">‘ %(limit)s’</span>) %</span><br><span class="line"> &#123;<span class="string">‘value’</span>: value, <span class="string">‘limit’</span>: limit&#125;)</span><br><span class="line"> <span class="keyword">return</span> op(value, limit)</span><br><span class="line"></span><br><span class="line"> self._transition(alarm,</span><br><span class="line"> statistics,</span><br><span class="line"> map(_compare, statistics))</span><br></pre></td></tr></table></figure>
+
+<p>这里先判断数据是否充足;<br>不充足刷新alarm状态为insufficient data;<br>充足则执行下面的代码方法_transition;</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def _transition(<span class="literal">self</span>, alarm, statistics, compared):</span><br><span class="line"> <span class="comment">#是否alarm定义的所有statistics均满足</span></span><br><span class="line"> distilled = <span class="literal">all</span>(compared)</span><br><span class="line"> <span class="comment">#是否alarm定义的所有statistics均满足或均不满足</span></span><br><span class="line"> unequivocal = distilled or not <span class="literal">any</span>(compared)</span><br><span class="line"> <span class="comment">#alarm的当前状态是否为UNKNOWN</span></span><br><span class="line"> <span class="literal">unknown</span> = alarm.<span class="keyword">state</span> == evaluator.UNKNOWN</span><br><span class="line"> <span class="comment">#是否连续</span></span><br><span class="line"> continuous = alarm.repeat_actions</span><br><span class="line"> <span class="comment">#如果都满足或都不满足的时候，若是都满足，转换为alarm;若都不满足，则转换ok，为正常状态;</span></span><br><span class="line"> if unequivocal:</span><br><span class="line"> <span class="keyword">state</span> = evaluator.ALARM if distilled else evaluator.OK</span><br><span class="line"> reason, reason_data = <span class="literal">self</span>._reason(alarm, statistics,</span><br><span class="line"> distilled, <span class="keyword">state</span>)</span><br><span class="line"> <span class="comment">#如果当前状态与目标状态不同，则需要转换；另外，如果alarm的repeat_actions被设置，则状态相同也要进行转换</span></span><br><span class="line"> if alarm.<span class="keyword">state</span> != <span class="keyword">state</span> or continuous:</span><br><span class="line"> <span class="literal">self</span>._refresh(alarm, <span class="keyword">state</span>, reason, reason_data)</span><br><span class="line"> elif <span class="literal">unknown</span> or continuous:</span><br><span class="line"> trending_state = evaluator.ALARM if compared[-<span class="number">1</span>] else evaluator.OK</span><br><span class="line"> <span class="keyword">state</span> = trending_state if <span class="literal">unknown</span> else alarm.<span class="keyword">state</span></span><br><span class="line"> reason, reason_data = <span class="literal">self</span>._reason(alarm, statistics,</span><br><span class="line"> distilled, <span class="keyword">state</span>)</span><br><span class="line"> <span class="literal">self</span>._refresh(alarm, <span class="keyword">state</span>, reason, reason_data)</span><br></pre></td></tr></table></figure>
+
+<p>接下来看函数_refresh（/ceilometer/alarm/evaluator/<strong>init</strong>.py）</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">def _refresh(<span class="literal">self</span>, alarm, <span class="keyword">state</span>, reason, reason_data):</span><br><span class="line"> <span class="string">“”</span><span class="string">“Refresh alarm state.”</span><span class="string">“”</span></span><br><span class="line"> try:</span><br><span class="line"> previous = alarm.<span class="keyword">state</span></span><br><span class="line"> if previous != <span class="keyword">state</span>:</span><br><span class="line"> LOG.info(_(‘alarm %(id)s transitioning <span class="keyword">to</span> %(<span class="keyword">state</span>)s because ‘</span><br><span class="line"> ‘%(reason)s’) % &#123;’id’: alarm.alarm_id,</span><br><span class="line"> ‘<span class="keyword">state</span>‘: <span class="keyword">state</span>,</span><br><span class="line"> ‘reason’: reason&#125;)</span><br><span class="line"></span><br><span class="line"> <span class="literal">self</span>._client.alarms.set_state(alarm.alarm_id, <span class="keyword">state</span>=<span class="keyword">state</span>)</span><br><span class="line"> alarm.<span class="keyword">state</span> = <span class="keyword">state</span></span><br><span class="line"> if <span class="literal">self</span>.notifier:</span><br><span class="line"> <span class="literal">self</span>.notifier.notify(alarm, previous, reason, reason_data)</span><br><span class="line"> except Exception:</span><br><span class="line"> <span class="comment"># retry will occur naturally on the next evaluation</span></span><br><span class="line"> <span class="comment"># cycle (unless alarm state reverts in the meantime)</span></span><br><span class="line"> LOG.exception(_(‘alarm <span class="keyword">state</span> update failed’))</span><br></pre></td></tr></table></figure>
+
+<p>这里才是真正设置状态的地方，对比之前和现在的状态，不一样则改之，反之;</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.z" target="_blank" title="署名-相同方式共享">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        本作品采用知识共享 署名-相同方式共享 4.0 国际许可协议进行许可。
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  //id: '', // 可选。默认为 location.href
+  owner: 'ly798',
+  repo: 'ly798.github.io',
+  oauth: {
+    client_id: '2fe6316287423f61930e',
+    client_secret: 'fbdf494bea3807f3cc659bea10bbd1e0db4ab1e1',
+  },
+})
+gitment.render('container')
+</script>
+
+
+          <div class="main-footer">
+  
+    © 2019 LYang blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>
